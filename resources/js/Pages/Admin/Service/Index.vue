@@ -144,7 +144,7 @@ function destroy(id) {
                             <td>
                                 {{ organization.number_of_beneficiary }}
                             </td>
-                            <td data-label="File">
+                            <td data-label="URL">
                                 <div class="w-12 rounded">
                                     <div>
 

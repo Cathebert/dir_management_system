@@ -115,7 +115,7 @@ function destroy(id) {
                                 {{ organization.name }}
                                 </Link>
                             </td>
-                            <td data-label="File">
+                            <td data-label="Logo">
                                 <div class="w-12 rounded">
                                     <div v-if="organization.logo ===null">
                                         <img :src="default_logo" :alt="organization.url" style="border-radius: 50%;"

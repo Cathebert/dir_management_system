@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from "@inertiajs/vue3"
 import {
-    mdiMultimedia,
+
     mdiPlus,
     mdiSquareEditOutline,
     mdiTrashCan,
@@ -95,7 +95,7 @@ function destroy(id) {
                     <tbody>
 
                         <tr v-for="media in items.data" :key="media.id">
-                            <td data-label="File">
+                            <td data-label="#">
                                  {{ media.id }}
                             </td>
                             <td data-label="Name">
