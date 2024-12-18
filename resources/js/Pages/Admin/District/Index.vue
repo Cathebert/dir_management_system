@@ -41,7 +41,7 @@ const formDelete = useForm({})
 
 function destroy(id) {
     if (confirm("Are you sure you want to delete?")) {
-        formDelete.delete(route("admin.media.destroy", id))
+        formDelete.delete(route("admin.district.destroy", id))
     }
 }
 </script>
@@ -77,6 +77,7 @@ function destroy(id) {
                         </div>
                     </div>
                 </form>
+
             </CardBox>
             <CardBox class="mb-6" has-table>
                 <table>
@@ -108,14 +109,13 @@ function destroy(id) {
                                 {{ media.name }}
                                 </Link>
                             </td>
-
                             <td data-label="created_at">
                                 {{ new Date(media.created_at).toLocaleString().slice(0, 10) }}
                             </td>
                             <td v-if="can.edit || can.delete" class="before:hidden lg:w-1 whitespace-nowrap">
                                 <BaseButtons type="justify-start lg:justify-end" no-wrap>
                                     <BaseButton v-if="can.edit" :route-name="route('admin.district.edit', media.id)"
-                                        color="info" :icon="mdiSquareEditOutline" small />
+                                         color="info" :icon="mdiSquareEditOutline" small />
                                     <BaseButton v-if="can.delete" color="danger" :icon="mdiTrashCan" small
                                         @click="destroy(media.id)" />
                                 </BaseButtons>

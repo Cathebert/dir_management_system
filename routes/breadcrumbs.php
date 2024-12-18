@@ -70,6 +70,7 @@ Breadcrumbs::resource('admin.permission', 'Permissions');
 Breadcrumbs::resource('admin.role', 'Roles');
 
 Breadcrumbs::resource('admin.district', 'District');
+
 Breadcrumbs::resource('admin.organization', 'Organization');
 Breadcrumbs::resource('admin.service', 'Service');
 Breadcrumbs::resource('admin.report', 'Reports');
@@ -84,7 +85,14 @@ Breadcrumbs::resource('admin.category.type.item', 'Items', 'admin.category.type'
 Breadcrumbs::for('admin.account.info', function (BreadcrumbTrail $trail) {
     $trail->parent('admin.dashboard');
     $trail->push('Account Info', route('admin.account.info'));
-
-
 });
 
+    Breadcrumbs::for('admin.district.addArea', function (BreadcrumbTrail $trail,$id) {
+    $trail->parent('admin.dashboard');
+    $trail->push('Add Area', route('admin.district.addArea',[$id]));
+});
+
+Breadcrumbs::for('admin.district.storeArea', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.dashboard');
+    $trail->push('Store Area', route('admin.district.storeArea'));
+});

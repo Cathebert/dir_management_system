@@ -9,6 +9,7 @@ use BalajiDharma\LaravelAdminCore\Data\Media\MediaData;
 use Plank\Mediable\Media;
 use Illuminate\Support\Facades\Auth;
 use App\Models\District;
+use App\Models\DistrictTraditional;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
@@ -59,7 +60,7 @@ class DistrictController extends Controller
      */
     public function create()
     {
-        $this->authorize('adminCreate', Media::class);
+        $this->authorize('adminCreate', District::class);
         $typeOptions = media_type_as_options();
 
         return Inertia::render('Admin/District/Create', [
@@ -93,8 +94,34 @@ $district->save();
 
         $this->authorize('adminView', $media);
 
+        $mediaItems = (new DistrictTraditional)->newQuery();
+
+
+            $mediaItems->where('district_id', $id);
+
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $mediaItems->orderBy($attribute, $sort_order);
+        } else {
+            $mediaItems->latest();
+        }
+
+        $mediaItems = $mediaItems->paginate(config('admin.paginate.per_page'))
+            ->onEachSide(config('admin.paginate.each_side'));
         return Inertia::render('Admin/District/Show', [
             'district' =>$media,
+            'items' =>collect($mediaItems),
+            'can' => [
+                'create' => Auth::user()->can('media create'),
+                'edit' => Auth::user()->can('media edit'),
+                'delete' => Auth::user()->can('media delete'),
+            ],
         ]);
     }
 
@@ -136,5 +163,24 @@ $district->save();
     public function destroy(string $id)
     {
         //
+    }
+    public function addArea(Request $request,$id){
+         $this->authorize('adminCreate', District::class);
+        $typeOptions = media_type_as_options();
+
+        return Inertia::render('Admin/District/AddArea', [
+            'id' => $id,
+        ]);
+    }
+    public function addAreaToDistrict(Request $request){
+
+$tradition=new DistrictTraditional();
+$tradition->district_id=$request->id;
+$tradition->name=$request->name;
+$tradition->created_at=now();
+$tradition->updated_at=NULL;
+$tradition->save();
+        return redirect()->route('admin.district.show',$request->id)
+            ->with('message', __('T/A Saved successfully.'));
     }
 }
