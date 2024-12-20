@@ -91,7 +91,10 @@ Breadcrumbs::for('admin.account.info', function (BreadcrumbTrail $trail) {
     $trail->parent('admin.dashboard');
     $trail->push('Add Area', route('admin.district.addArea',[$id]));
 });
-
+   Breadcrumbs::for('admin.district.ta.edit', function (BreadcrumbTrail $trail,$id) {
+    $trail->parent('admin.dashboard');
+    $trail->push('Add Area', route('admin.district.ta.edit',[$id]));
+});
 Breadcrumbs::for('admin.district.storeArea', function (BreadcrumbTrail $trail) {
     $trail->parent('admin.dashboard');
     $trail->push('Store Area', route('admin.district.storeArea'));

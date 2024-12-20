@@ -183,4 +183,28 @@ $tradition->save();
         return redirect()->route('admin.district.show',$request->id)
             ->with('message', __('T/A Saved successfully.'));
     }
+
+
+public function editDistrictTA(Request $request, $id){
+   $ta=DistrictTraditional::where('id',$id)->first();
+
+         $this->authorize('adminCreate', District::class);
+        $typeOptions = media_type_as_options();
+
+        return Inertia::render('Admin/District/TAEdit', [
+            'ta' => $ta,
+
+        ]);
+    }
+
+
+public function updateDistrictTA(Request $request){
+
+DistrictTraditional::where('id',$request->id)->update([
+'name'=>$request->name,
+'updated_at'=>now()
+]);
+     return redirect()->route('admin.district.show',$request->district)
+            ->with('message', __('T/A Saved successfully.'));
+}
 }

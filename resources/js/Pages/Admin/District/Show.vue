@@ -110,7 +110,7 @@ const props = defineProps({
                                 {{ traditional.id }}
                             </td>
                             <td data-label="Name">
-                                <Link :href="route('admin.district.show', traditional.id)" class="
+                                <Link :href="route('admin.district.ta.edit', traditional.id)" class="
                     no-underline
                     hover:underline
                     text-cyan-600
@@ -124,7 +124,7 @@ const props = defineProps({
                             </td>
                             <td v-if="can.edit" class="before:hidden lg:w-1 whitespace-nowrap">
                                 <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                                    <BaseButton v-if="can.edit" :route-name="route('admin.district.edit', traditional.id)"
+                                    <BaseButton v-if="can.edit" :route-name="route('admin.district.ta.edit',traditional.id)"
                                         color="info" :icon="mdiSquareEditOutline" small />
 
                                 </BaseButtons>
