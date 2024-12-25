@@ -96,7 +96,7 @@ onMounted(() => {
 
 const props = defineProps({
     organizations: {
-        type: Array,
+        type: Object,
         default: () => ({}),
 
     },
@@ -123,15 +123,14 @@ const props = defineProps({
         default: () => ({}),
     },
     districts: {
-        type: Array,
+        type: Object,
         default: () => ({}),
     },
 
 
 
-
 })
-
+let tas=[];
 const form = useForm({
 
     name: null,
@@ -146,10 +145,23 @@ const form = useForm({
     challenges: null,
     latitude: null,
     longitude: null,
-    coordinates:[]
+    coordinates:[],
+    ta:null
 
 
 })
+function sayHello(id){
+    let route = window.routes.getTas
+    axios
+        .get(route+'/'+id)
+        .then(function(result) {
+           tas =result.data;
+           console.log(tas)
+
+        }.bind(this))
+
+}
+
 </script>
 
 <template>
@@ -181,9 +193,18 @@ const form = useForm({
 
 
                 <FormField label="District" :class="{ 'text-red-400': form.errors.district }">
-                    <FormControl v-model="form.district" type="select" label="name"
-                        placeholder="--Select Organization--" :error="form.errors.district"
-                        :options="districts">
+
+                    <FormControl v-model="form.district" type="select" label="name" placeholder="--Select District--"
+                        :error="form.errors.district" :options="districts" @update:modelValue="sayHello($event)">
+                        <div class="text-red-400 text-sm" v-if="form.errors.district">
+                            {{ form.errors.district }}
+                        </div>
+                    </FormControl>
+                </FormField>
+
+                <FormField label="T/A" :class="{ 'text-red-400': form.errors.district }">
+                    <FormControl v-model="form.ta" type="select" :options="tas" label="name" placeholder="--Select T/A--"
+                        :error="form.errors.ta">
                         <div class="text-red-400 text-sm" v-if="form.errors.district">
                             {{ form.errors.district }}
                         </div>

@@ -89,6 +89,7 @@ const textareaEl = ref(null)
 const inputEl = ref(null)
 
 onMounted(() => {
+
   if (selectEl.value) {
     emit('setRef', selectEl.value)
   } else if (textareaEl.value) {
@@ -122,6 +123,7 @@ if (props.ctrlKFocus) {
     mainStore.isFieldFocusRegistered = false
   })
 }
+
 </script>
 
 <template>
@@ -133,12 +135,15 @@ if (props.ctrlKFocus) {
       :name="name"
       :class="inputElClass"
     >
+
       <option value="" v-if="placeholder"> {{ placeholder }}</option>
+
       <option
-        v-for="(option, index) in options"
-        :key="index"
-        :value="option"
-        v-html="option"
+        v-for="option in options"
+        :key="option.id"
+        :value="option.id"
+        v-html="option.name"
+
       >
       </option>
     </select>

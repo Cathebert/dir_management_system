@@ -51,4 +51,5 @@ Route::group([
       Route::post('addAreaToDistrict','DistrictController@addAreaToDistrict')->name('district.storeArea');
       Route::get('editDistrictTA/{id}','DistrictController@editDistrictTA')->name('district.ta.edit');
       Route::put('updateDistrictTA','DistrictController@updateDistrictTA')->name('district.ta.update');
+      Route::get('getDistrictTA/{id?}','DistrictController@getDistrictTA')->name('tas');
 });

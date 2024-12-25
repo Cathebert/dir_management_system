@@ -207,4 +207,8 @@ DistrictTraditional::where('id',$request->id)->update([
      return redirect()->route('admin.district.show',$request->district)
             ->with('message', __('T/A Saved successfully.'));
 }
+public function getDistrictTA(Request $request, $id){
+    $tas=DistrictTraditional::where('district_id',$id)->select('id','name')->get();
+    return $tas;
+}
 }

@@ -99,3 +99,7 @@ Breadcrumbs::for('admin.district.storeArea', function (BreadcrumbTrail $trail) {
     $trail->parent('admin.dashboard');
     $trail->push('Store Area', route('admin.district.storeArea'));
 });
+Breadcrumbs::for('admin.tas', function (BreadcrumbTrail $trail,$id) {
+    $trail->parent('admin.dashboard');
+    $trail->push('Store Area', route('admin.tas',[$id]));
+});

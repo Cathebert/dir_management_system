@@ -64,7 +64,7 @@ class MediaController extends Controller
     {
         $this->authorize('adminCreate', Media::class);
         $typeOptions = media_type_as_options();
-
+dd($typeOptions);
         return Inertia::render('Admin/Media/Create', [
             'typeOptions' => $typeOptions,
         ]);

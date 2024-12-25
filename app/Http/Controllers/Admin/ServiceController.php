@@ -60,13 +60,11 @@ class ServiceController extends Controller
     public function create()
     {
        $this->authorize('adminCreate', Service::class);
-       $organizations= array();
-        $typeOptions = Organization::select('name')->get();
-foreach($typeOptions as $org){
-    $organizations[]=$org->name;
-}
+
+      $organizations = Organization::select('id','name')->get();
+
 $districts=array();
-$names=District::select('name')->get();
+$names=District::select('id','name')->get();
 foreach($names as $district){
     $districts[]=$district->name;
 }
@@ -78,7 +76,7 @@ foreach($names as $district){
         $locations=array('1','2-3','4-5','More than 5');
         return Inertia::render('Admin/Service/Create', [
             'organizations' =>$organizations,
-            'districts'=>$districts,
+            'districts'=>$names,
             'types'=>$types,
             'scopes'=>$scope,
             'beneficies'=>$beneficies,

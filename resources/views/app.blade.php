@@ -16,6 +16,15 @@
         @inertiaHead
     </head>
     <body class="font-sans antialiased">
+        <script>
+  window.routes = {
+    'getTas' : '{{ route('admin.tas') }}',
+
+  }
+
+  // You can access it like this
+
+</script>
         @inertia
     </body>
 </html>
