@@ -209,6 +209,6 @@ DistrictTraditional::where('id',$request->id)->update([
 }
 public function getDistrictTA(Request $request, $id){
     $tas=DistrictTraditional::where('district_id',$id)->select('id','name')->get();
-    return $tas;
+    return response()->json(['states'=>$tas]);
 }
 }

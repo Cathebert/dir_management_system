@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
+use App\Models\OrganizationType;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -60,10 +61,10 @@ class OrganizationController extends Controller
     {
         //
           $this->authorize('adminCreate', Media::class);
-        $typeOptions = media_type_as_options();
+        $org_type= OrganizationType::get();
 
         return Inertia::render('Admin/Organisation/Create', [
-            'typeOptions' => $typeOptions,
+            'typeOptions' => $org_type,
         ]);
     }
 
@@ -85,6 +86,7 @@ $logo='/logo/'.$filename;
 $request->file->move(public_path()."/logo/", $filename);
     }
 $organization=new Organization();
+$organization->organization_type_id=$request->type;
 $organization->name=$request->name;
 $organization->description=$request->description;
 $organization->phone=$request->phone;
@@ -116,10 +118,12 @@ $organization->save();
     {
        $organization= Organization::findOrFail($id);
         $this->authorize('adminUpdate', $organization);
-
-
+ $typeOptions = OrganizationType::get();
+$selected=OrganizationType::where('id',$organization->organization_type_id)->first();
         return Inertia::render('Admin/Organisation/Edit', [
             'organization' => $organization,
+             'typeOptions' => $typeOptions,
+             'selected'=>$selected,
 
         ]);
     }
@@ -129,10 +133,11 @@ $organization->save();
      */
     public function update(Request $request,$id)
     {
-//dd($request);
+
 
         $name=$request->name;
         $description=$request->description;
+        $type=$request->type;
         $phone=$request->phone;
         $email=$request->email;
         $url=$request->url;
@@ -154,6 +159,7 @@ $logo='/logo/'.$filename;
  Organization::where('id',$id)->update([
 'name'=>$name,
 'description'=>$description,
+'organization_type_id'=>$type,
 'phone'=>$phone,
 'url'=>$url,
 'logo'=>$logo,

@@ -22,11 +22,16 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    selected: {
+        type: Object,
+        default: () => ({}),
+    },
 })
 
 const form = useForm({
     _method: 'put',
     name: props.organization.name,
+    type: props.typeOptions.id??props.selected.id,
     description: props.organization.description,
     url: props.organization.url,
     phone:props.organization.phone,
@@ -61,7 +66,14 @@ const form = useForm({
                         </div>
                     </FormControl>
                 </FormField>
-
+                 <FormField label="Name" :class="{ 'text-red-400': form.errors.type }">
+                    <FormControl v-model="form.type" type="select" placeholder="--Select Type--"
+                        :error="form.errors.type" :options="typeOptions"  >
+                        <div class="text-red-400 text-sm" v-if="form.errors.type">
+                            {{ form.errors.type }}
+                        </div>
+                    </FormControl>
+                </FormField>
                 <FormField label="Mission/Vision" :class="{ 'text-red-400': form.errors.description }">
                     <FormControl v-model="form.description" type="textarea" placeholder="Enter Mission/Vision"
                         :error="form.errors.description">
@@ -81,8 +93,7 @@ const form = useForm({
                     </FormControl>
                 </FormField>
                 <FormField label="Phone" :class="{ 'text-red-400': form.errors.phone }">
-                    <FormControl v-model="form.phone" type="text" placeholder="Enter Phone"
-                        :error="form.errors.phone">
+                    <FormControl v-model="form.phone" type="text" placeholder="Enter Phone" :error="form.errors.phone">
                         <div class="text-red-400 text-sm" v-if="form.errors.phone">
                             {{ form.errors.phone }}
                         </div>
@@ -90,16 +101,14 @@ const form = useForm({
                 </FormField>
 
                 <FormField label="URL" :class="{ 'text-red-400': form.errors.url }">
-                    <FormControl v-model="form.url" type="text" placeholder="Enter Url"
-                        :error="form.errors.url">
+                    <FormControl v-model="form.url" type="text" placeholder="Enter Url" :error="form.errors.url">
                         <div class="text-red-400 text-sm" v-if="form.errors.url">
                             {{ form.errors.url }}
                         </div>
                     </FormControl>
                 </FormField>
                 <FormField label="Email" :class="{ 'text-red-400': form.errors.email }">
-                    <FormControl v-model="form.email" type="text" placeholder="Enter Email"
-                        :error="form.errors.email">
+                    <FormControl v-model="form.email" type="text" placeholder="Enter Email" :error="form.errors.email">
                         <div class="text-red-400 text-sm" v-if="form.errors.email">
                             {{ form.errors.email }}
                         </div>

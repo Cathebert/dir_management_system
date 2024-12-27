@@ -25,6 +25,7 @@ const props = defineProps({
 const form = useForm({
 
     name:null,
+    type:null,
     description:null,
     email:null,
     address:null,
@@ -44,14 +45,7 @@ const form = useForm({
                     color="white" rounded-full small />
             </SectionTitleLineWithButton>
             <CardBox form @submit.prevent="form.post(route('admin.organization.store'))">
-                <!--FormField label="Type" :class="{ 'text-red-400': form.errors.type }">
-                    <FormControl v-model="form.type" type="select" placeholder="--Select Type--"
-                        :error="form.errors.type" :options="typeOptions">
-                        <div class="text-red-400 text-sm" v-if="form.errors.type">
-                            {{ form.errors.type }}
-                        </div>
-                    </FormControl>
-                </FormField>-->
+
                 <FormField label="Name" :class="{ 'text-red-400': form.errors.name }">
                     <FormControl v-model="form.name" type="text" placeholder="Enter Organization Name"
                         :error="form.errors.name">
@@ -60,7 +54,14 @@ const form = useForm({
                         </div>
                     </FormControl>
                 </FormField>
-
+                <FormField label="Type" :class="{ 'text-red-400': form.errors.type }">
+                    <FormControl v-model="form.type" type="select" placeholder="--Select Type--"
+                        :error="form.errors.type" :options="typeOptions">
+                        <div class="text-red-400 text-sm" v-if="form.errors.type">
+                            {{ form.errors.type }}
+                        </div>
+                    </FormControl>
+                </FormField>
                 <FormField label="Mission/Vision" :class="{ 'text-red-400': form.errors.description }">
                     <FormControl v-model="form.description" type="textarea" placeholder="Enter Mission /Vision"
                         :error="form.errors.description">
@@ -81,7 +82,8 @@ const form = useForm({
                 </FormField>
 
                 <FormField label="Address" :class="{ 'text-red-400': form.errors.address }">
-                    <FormControl v-model="form.address" type="text" placeholder="Enter Email" :error="form.errors.address">
+                    <FormControl v-model="form.address" type="text" placeholder="Enter Email"
+                        :error="form.errors.address">
                         <div class="text-red-400 text-sm" v-if="form.errors.address">
                             {{ form.errors.address }}
                         </div>

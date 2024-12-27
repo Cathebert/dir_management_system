@@ -5,7 +5,7 @@ import {
     mdiArrowLeftBoldOutline,
     mdiHome
 } from "@mdi/js"
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, watchEffect } from 'vue';
 import LayoutAuthenticated from "@/Layouts/Admin/LayoutAuthenticated.vue"
 import SectionMain from "@/Components/SectionMain.vue"
 import SectionTitleLineWithButton from "@/Components/SectionTitleLineWithButton.vue"
@@ -93,7 +93,7 @@ onMounted(() => {
 //L.marker([e.latlng.lat, e.latlng.lng],).addTo(map);
 });
 
-
+let TAs = ref({})
 const props = defineProps({
     organizations: {
         type: Object,
@@ -118,6 +118,11 @@ const props = defineProps({
         type: Array,
         default: () => ({}),
     },
+
+    charges: {
+        type: Array,
+        default: () => ({}),
+    },
     locations: {
         type: Array,
         default: () => ({}),
@@ -127,10 +132,13 @@ const props = defineProps({
         default: () => ({}),
     },
 
-
+tas:{
+    type: Object,
+    default: () => ({}),
+}
 
 })
-let tas=[];
+let tal=new Array();
 const form = useForm({
 
     name: null,
@@ -139,6 +147,7 @@ const form = useForm({
     type:null,
     scope: null,
     beneficiary:null,
+    charge:null,
     number:null,
     unique:null,
     location:null,
@@ -150,17 +159,32 @@ const form = useForm({
 
 
 })
+
+
+
+
+
 function sayHello(id){
+    if(id){
     let route = window.routes.getTas
     axios
         .get(route+'/'+id)
         .then(function(result) {
-           tas =result.data;
-           console.log(tas)
+    TAs =result.data.states;
+           console.log(TAs);
+            form.ta = TAs
+        })
 
-        }.bind(this))
+
 
 }
+else{
+        form.ta=null
+        TAs=[]
+
+}
+}
+
 
 </script>
 
@@ -183,7 +207,7 @@ function sayHello(id){
                     </FormControl>
                 </FormField>-->
                 <FormField label="Name" :class="{ 'text-red-400': form.errors.name }">
-                    <FormControl v-model="form.name" type="text" placeholder="Enter Service Name"
+                    <FormControl v-model="form.name" type="text" placeholder="Enter Service/Project Name"
                         :error="form.errors.name">
                         <div class="text-red-400 text-sm" v-if="form.errors.name">
                             {{ form.errors.name }}
@@ -203,8 +227,8 @@ function sayHello(id){
                 </FormField>
 
                 <FormField label="T/A" :class="{ 'text-red-400': form.errors.district }">
-                    <FormControl v-model="form.ta" type="select" :options="tas" label="name" placeholder="--Select T/A--"
-                        :error="form.errors.ta">
+                    <FormControl v-model="form.ta" type="select" :options="TAs" label="name"
+                        placeholder="--Select T/A--" :error="form.errors.ta">
                         <div class="text-red-400 text-sm" v-if="form.errors.district">
                             {{ form.errors.district }}
                         </div>
@@ -254,6 +278,16 @@ function sayHello(id){
                         placeholder="--Select Beneficiary Target per Month--" :error="form.errors.number"
                         :options="numbers">
                         <div class="text-red-400 text-sm" v-if="form.errors.number">
+                            {{ form.errors.number }}
+                        </div>
+                    </FormControl>
+                </FormField>
+
+                <FormField label="Service Charge" :class="{ 'text-red-400': form.errors.charge }">
+                    <FormControl v-model="form.charge" type="select" label="name"
+                        placeholder="--Select Service Charge" :error="form.errors.charge"
+                        :options="charges">
+                        <div class="text-red-400 text-sm" v-if="form.errors.charge">
                             {{ form.errors.number }}
                         </div>
                     </FormControl>

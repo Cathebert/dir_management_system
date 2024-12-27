@@ -69,9 +69,10 @@ foreach($names as $district){
     $districts[]=$district->name;
 }
         //dd($typeOptions);
-        $types=array('Health','Education','Social Protection','Nutrition','Water, Sanitation, and Hygiene (WASH)','Economic Empowerment','Financial Inclusion','Other (Specify)');
+        $types=DB::table('service_sectors')->get();
         $scope=array('Preventive','Curative','Supportive','Advocacy','Capacity Building','Other(Specify)');
-        $beneficies=array('Children','Women','Elderly','Disabled','Youth','Other(Specify)');
+        $beneficies=DB::table('beneficiaries')->get();
+        $charges=DB::table('service_charges')->get();
         $number=array('<100','100-500','501-1000','>1000');
         $locations=array('1','2-3','4-5','More than 5');
         return Inertia::render('Admin/Service/Create', [
@@ -82,6 +83,7 @@ foreach($names as $district){
             'beneficies'=>$beneficies,
             'numbers'=>$number,
             'locations'=>$locations,
+            'charges'=>$charges,
 
         ]);
     }
@@ -91,7 +93,7 @@ foreach($names as $district){
      */
     public function store(Request $request)
     {
-
+dd($request);
 
          $request->validate([
         'name' => 'required',
