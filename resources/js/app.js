@@ -1,5 +1,6 @@
 import './bootstrap';
 import '../css/app.css';
+import 'vue-multiselect/dist/vue-multiselect.css';
 
 import { createApp, h } from 'vue';
 import { createInertiaApp, router } from '@inertiajs/vue3';
@@ -8,7 +9,7 @@ import { useDarkModeStore } from '@/Stores/darkMode.js'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'DMS';
 
 const pinia = createPinia();
 
@@ -17,7 +18,7 @@ createInertiaApp({
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
-            .use(plugin)    
+            .use(plugin)
             .use(ZiggyVue, Ziggy)
             .mount(el);
     },

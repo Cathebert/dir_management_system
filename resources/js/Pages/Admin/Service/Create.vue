@@ -15,11 +15,13 @@ import FormControl from '@/Components/FormControl.vue'
 
 import BaseButton from '@/Components/BaseButton.vue'
 import BaseButtons from '@/Components/BaseButtons.vue'
+import VueMultiselect from 'vue-multiselect'
 
 import "leaflet/dist/leaflet.css"
 import L from 'leaflet';
 
 let map =ref(null)
+
 const center = [-13.9499962, 33.6999972];
 let marker=null
 let circle=null
@@ -142,11 +144,15 @@ let tal=new Array();
 const form = useForm({
 
     name: null,
+    description: null,
+
     district:null,
     organization:null,
     type:null,
     scope: null,
     beneficiary:null,
+    start:null,
+    end:null,
     charge:null,
     number:null,
     unique:null,
@@ -155,16 +161,17 @@ const form = useForm({
     latitude: null,
     longitude: null,
     coordinates:[],
-    ta:null
+    ta:null,
+    other_b:null
 
 
 })
+form.beneficiary = ref();
+const activeColor = ref('black')
 
 
 
-
-
-function sayHello(id){
+function getTAs(id){
     if(id){
     let route = window.routes.getTas
     axios
@@ -184,6 +191,7 @@ else{
 
 }
 }
+
 
 
 </script>
@@ -215,11 +223,30 @@ else{
                     </FormControl>
                 </FormField>
 
+                <FormField label="Service Description" :class="{ 'text-red-400': form.errors.description }">
+                    <FormControl v-model="form.description" type="number" :error="form.errors.description">
+                        <div class="text-red-400 text-sm" v-if="form.errors.description">
+                            {{ form.errors.description}}
+                        </div>
+                    </FormControl>
+                </FormField>
 
+                <FormField label="Organization" :class="{ 'text-red-400': form.errors.organization }">
+
+                    <FormControl v-model="form.organization" type="select" label="name"
+                        placeholder="--Select Organization--" :error="form.errors.organization"
+                        :options="organizations">
+                        <div class="text-red-400 text-sm" v-if="form.errors.organization">
+                            {{ form.errors.organization }}
+                        </div>
+
+                    </FormControl>
+
+                </FormField>
                 <FormField label="District" :class="{ 'text-red-400': form.errors.district }">
 
                     <FormControl v-model="form.district" type="select" label="name" placeholder="--Select District--"
-                        :error="form.errors.district" :options="districts" @update:modelValue="sayHello($event)">
+                        :error="form.errors.district" :options="districts" @update:modelValue="getTAs($event)">
                         <div class="text-red-400 text-sm" v-if="form.errors.district">
                             {{ form.errors.district }}
                         </div>
@@ -234,24 +261,43 @@ else{
                         </div>
                     </FormControl>
                 </FormField>
-                <FormField label="Organization" :class="{ 'text-red-400': form.errors.organization }">
-                    <FormControl v-model="form.organization" type="select" label="name"
-                        placeholder="--Select Organization--" :error="form.errors.organization"
-                        :options="organizations">
-                        <div class="text-red-400 text-sm" v-if="form.errors.organization">
-                            {{ form.errors.organization }}
-                        </div>
-                    </FormControl>
-                </FormField>
-                <FormField label="Type Of Service" :class="{ 'text-red-400': form.errors.type }">
-                    <FormControl v-model="form.type" type="select" label="name" placeholder="--Select Service Type--"
-                        :error="form.errors.type" :options="types">
-                        <div class="text-red-400 text-sm" v-if="form.errors.type">
-                            {{ form.errors.type }}
+                <FormField label="Number projects" :class="{ 'text-red-400': form.errors.number }">
+                    <FormControl v-model="form.number" type="number" :error="form.errors.number">
+                        <div class="text-red-400 text-sm" v-if="form.errors.number">
+                            {{ form.errors.number }}
                         </div>
                     </FormControl>
                 </FormField>
 
+                <div>
+                    <FormField label="Service Type" :class="{ 'text-red-400': form.errors.start }">
+                        <VueMultiselect v-model="form.type" :options="types" :multiple="true" :close-on-select="true"
+                            placeholder="--Select Service Type--" label="name" track-by="name"
+                            :style="{ 'background-color' : activeColor }" />
+                    </FormField>
+                    <div class="text-red-400 text-sm" v-if="form.errors.type">
+                        {{ form.errors.type }}
+
+                    </div>
+
+                </div>
+
+
+                <FormField label="Start Date" :class="{ 'text-red-400': form.errors.start }">
+                    <FormControl v-model="form.start" type="date" :error="form.errors.start">
+                        <div class="text-red-400 text-sm" v-if="form.errors.start">
+                            {{ form.errors.start }}
+                        </div>
+                    </FormControl>
+                </FormField>
+
+                <FormField label="End Date" :class="{ 'text-red-400': form.errors.end }">
+                    <FormControl v-model="form.end" type="date" :error="form.errors.end">
+                        <div class="text-red-400 text-sm" v-if="form.errors.end">
+                            {{ form.errors.end }}
+                        </div>
+                    </FormControl>
+                </FormField>
                 <FormField label="Scope Of Service" :class="{ 'text-red-400': form.errors.scope }">
                     <FormControl v-model="form.scope" type="select" name="label" placeholder="--Select Service Scope--"
                         :error="form.errors.scope" :options="scopes">
@@ -270,29 +316,33 @@ else{
                         </div>
                     </FormControl>
                 </FormField>
-
-
-
-                <FormField label="Number Of Beneficiaries/month" :class="{ 'text-red-400': form.errors.number }">
-                    <FormControl v-model="form.number" type="select" label="name"
-                        placeholder="--Select Beneficiary Target per Month--" :error="form.errors.number"
-                        :options="numbers">
-                        <div class="text-red-400 text-sm" v-if="form.errors.number">
-                            {{ form.errors.number }}
+                <div v-show="form.beneficiary === 6">
+                    <FormField label="Other Type Beneficiary" :class="{ 'text-red-400': form.errors.name }">
+                        <FormControl v-model="form.other_b" type="text" placeholder="Other" :error="form.errors.name">
+                            <div class="text-red-400 text-sm" v-if="form.errors.name">
+                                {{ form.errors.name }}
+                            </div>
+                        </FormControl>
+                    </FormField>
+                </div>
+                <FormField label="Beneficiary Estimates" :class="{ 'text-red-400': form.errors.estimates }">
+                    <FormControl v-model="form.estimates" type="number" :error="form.errors.estimates">
+                        <div class="text-red-400 text-sm" v-if="form.errors.estimates">
+                            {{ form.errors.estimates }}
                         </div>
                     </FormControl>
                 </FormField>
 
+
                 <FormField label="Service Charge" :class="{ 'text-red-400': form.errors.charge }">
-                    <FormControl v-model="form.charge" type="select" label="name"
-                        placeholder="--Select Service Charge" :error="form.errors.charge"
-                        :options="charges">
+                    <FormControl v-model="form.charge" type="select" label="name" placeholder="--Select Service Charge"
+                        :error="form.errors.charge" :options="charges">
                         <div class="text-red-400 text-sm" v-if="form.errors.charge">
                             {{ form.errors.number }}
                         </div>
                     </FormControl>
                 </FormField>
-                <FormField label=" Locations  you operate in within the district"
+                <!-- <FormField label=" Locations  you operate in within the district"
                     :class="{ 'text-red-400': form.errors.location }">
                     <FormControl v-model="form.location" type="select" label="name"
                         placeholder="--Select Number of location in operation--" :error="form.errors.location"
@@ -321,7 +371,7 @@ else{
                             {{ form.errors.unique }}
                         </div>
                     </FormControl>
-                </FormField>
+                </FormField>-->
 
                 <FormField label="press S when desired location is pinned" style="color: brown;"
                     :class="{ 'text-red-400': form.errors.unique }">

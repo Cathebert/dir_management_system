@@ -70,7 +70,7 @@ foreach($names as $district){
 }
         //dd($typeOptions);
         $types=DB::table('service_sectors')->get();
-        $scope=array('Preventive','Curative','Supportive','Advocacy','Capacity Building','Other(Specify)');
+        $scope=DB::table('service_scopes')->get();
         $beneficies=DB::table('beneficiaries')->get();
         $charges=DB::table('service_charges')->get();
         $number=array('<100','100-500','501-1000','>1000');
@@ -93,10 +93,11 @@ foreach($names as $district){
      */
     public function store(Request $request)
     {
-dd($request);
 
+dd($request);
          $request->validate([
         'name' => 'required',
+        'start'=>'required',
         'organization'=>'required'
 
 
@@ -114,7 +115,7 @@ DB::beginTransaction();
        $service->type_of_beneficiary=$request->beneficiary;
        $service->number_of_beneficiary=$request->number;
        $service->unique_services=$request->unique;
-        $service->number_service_location=$request->location;
+       $service->number_service_location=$request->location;
        $service->challenges_faced=$request->challenges;
 
        $service->save();
@@ -131,7 +132,7 @@ $location->updated_at=NULL;
 $location->save();
     }
 }
-DB::commit();
+//DB::commit();
          return redirect()->route('admin.service.index')
             ->with('message', __('Service created successfully.'));
        } catch (Exception $e) {
