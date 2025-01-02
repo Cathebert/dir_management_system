@@ -66,7 +66,7 @@ const form = useForm({
                         </div>
                     </FormControl>
                 </FormField>
-                 <FormField label="Name" :class="{ 'text-red-400': form.errors.type }">
+                 <FormField label="Type" :class="{ 'text-red-400': form.errors.type }">
                     <FormControl v-model="form.type" type="select" placeholder="--Select Type--"
                         :error="form.errors.type" :options="typeOptions"  >
                         <div class="text-red-400 text-sm" v-if="form.errors.type">

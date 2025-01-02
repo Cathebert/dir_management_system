@@ -108,55 +108,120 @@ onMounted(() => {
 
     //L.marker([e.latlng.lat, e.latlng.lng],).addTo(map);
 });
+
+    let TAs = ref({})
 const props = defineProps({
+    service: {
+        type: Object,
+        default: () => ({}),
+
+    },
+        organizations: {
+            type: Object,
+            default: () => ({}),
+
+        },
     organization: {
         type: Object,
         default: () => ({}),
-    },
 
-    coordinates: {
+    },
+        types: {
+            type: Object,
+            default: () => ({}),
+        },
+
+        scopes: {
+            type: Array,
+            default: () => ({}),
+        },
+
+        beneficies: {
+            type: Array,
+            default: () => ({}),
+        },
+        numbers: {
+            type: Array,
+            default: () => ({}),
+        },
+
+        charges: {
+            type: Array,
+            default: () => ({}),
+        },
+        locations: {
+            type: Array,
+            default: () => ({}),
+        },
+districts: {
+            type: Object,
+            default: () => ({}),
+        },
+    district: {
         type: Object,
         default: () => ({}),
     },
-    types: {
+        tas: {
+            type: Object,
+            default: () => ({}),
+        }
+,
+        coordinates: {
         type: Object,
         default: () => ({}),
-    },
+    }
 
-    scopes: {
-        type: Array,
-        default: () => ({}),
-    },
-
-    beneficies: {
-        type: Array,
-        default: () => ({}),
-    },
-    numbers: {
-        type: Array,
-        default: () => ({}),
-    },
-    locations: {
-        type: Array,
-        default: () => ({}),
-    },
 
 })
 
 const form = useForm({
     _method: 'put',
-    name: props.organization.name,
-
-    type: props.organization.service_type,
-    scope: props.organization.service_scope,
-    beneficiary: props.organization.type_of_beneficiary,
-    number: props.organization.number_of_beneficiary,
-    unique: props.organization.unique_services,
-    challenges: props.organization.challenges_faced,
-    location: props.organization.number_service_location,
+    name: props.service.name,
+    description: props.service.description,
+    district: props.districts.id ?? props.district.id,
+    organization:props.organizations.id ?? props.organization.id,
+    ta: props.tas.id??props.service.ta,
+    type: null,
+    scope: null,
+    beneficiary: null,
+    start: props.service.start_date,
+    end: props.service.end_date,
+    charge: null,
+    number: props.service.number_of_beneficiary,
+    unique: null,
+    location: null,
+    challenges: null,
+    latitude: null,
+    longitude: null,
     coordinates: [],
 
+    other_b: null
 })
+form.beneficiary = ref();
+
+
+function getTAs(id) {
+    if (id) {
+        let route = window.routes.getTas
+        axios
+            .get(route + '/' + id)
+            .then(function (result) {
+                TAs = result.data.states;
+                console.log(TAs);
+                form.ta = TAs
+            })
+
+
+
+    }
+    else {
+        form.ta = null
+        TAs = []
+
+    }
+}
+
+
 </script>
 
 <template>
@@ -177,7 +242,7 @@ const form = useForm({
                         </div>
                     </FormControl>
                 </FormField>-->
-                <FormField label="Name" :class="{ 'text-red-400': form.errors.name }">
+                <FormField label="Service Name" :class="{ 'text-red-400': form.errors.name }">
                     <FormControl v-model="form.name" type="text" placeholder="Enter Service Name"
                         :error="form.errors.name">
                         <div class="text-red-400 text-sm" v-if="form.errors.name">
@@ -189,7 +254,54 @@ const form = useForm({
 
 
 
-                <FormField label="Type Of Service" :class="{ 'text-red-400': form.errors.type }">
+                <FormField label="Service Description" :class="{ 'text-red-400': form.errors.description }">
+                    <FormControl v-model="form.description" type="text" :error="form.errors.description">
+                        <div class="text-red-400 text-sm" v-if="form.errors.description">
+                            {{ form.errors.description }}
+                        </div>
+                    </FormControl>
+                </FormField>
+
+                <FormField label="Organization" :class="{ 'text-red-400': form.errors.organization }">
+
+                    <FormControl v-model="form.organization" type="select" label="name"
+                        placeholder="--Select Organization--" :error="form.errors.organization"
+                        :options="organizations">
+                        <div class="text-red-400 text-sm" v-if="form.errors.organization">
+                            {{ form.errors.organization }}
+                        </div>
+
+                    </FormControl>
+
+                </FormField>
+                <FormField label="District" :class="{ 'text-red-400': form.errors.district }">
+
+                    <FormControl v-model="form.district" type="select" label="name" placeholder="--Select District--"
+                        :error="form.errors.district" :options="districts" @update:modelValue="getTAs($event)">
+                        <div class="text-red-400 text-sm" v-if="form.errors.district">
+                            {{ form.errors.district }}
+                        </div>
+                    </FormControl>
+                </FormField>
+
+                <FormField label="T/A" :class="{ 'text-red-400': form.errors.district }">
+                    <FormControl v-model="form.ta" type="select" :options="TAs" label="name"
+                        placeholder="--Select T/A--" :error="form.errors.ta">
+                        <div class="text-red-400 text-sm" v-if="form.errors.district">
+                            {{ form.errors.district }}
+                        </div>
+                    </FormControl>
+                </FormField>
+                <FormField label="Number projects" :class="{ 'text-red-400': form.errors.number }">
+                    <FormControl v-model="form.number" type="number" :error="form.errors.number">
+                        <div class="text-red-400 text-sm" v-if="form.errors.number">
+                            {{ form.errors.number }}
+                        </div>
+                    </FormControl>
+                </FormField>
+
+                <FormField label="Service Type" :class="{ 'text-red-400': form.errors.type }">
+
                     <FormControl v-model="form.type" type="select" label="name" placeholder="--Select Service Type--"
                         :error="form.errors.type" :options="types">
                         <div class="text-red-400 text-sm" v-if="form.errors.type">
@@ -197,7 +309,36 @@ const form = useForm({
                         </div>
                     </FormControl>
                 </FormField>
+                <!--multiple selection hidden-->
+                <!--div>
+                    <FormField label="Service Type" :class="{ 'text-red-400': form.errors.start }">
+                        <VueMultiselect v-model="form.type" :options="types" :multiple="true" :close-on-select="true"
+                            placeholder="--Select Service Type--" label="name" track-by="name"
+                            :style="{ 'background-color' : activeColor }" />
+                    </FormField>
+                    <div class="text-red-400 text-sm" v-if="form.errors.type">
+                        {{ form.errors.type }}
 
+                    </div>
+
+                </div-->
+
+
+                <FormField label="Start Date" :class="{ 'text-red-400': form.errors.start }">
+                    <FormControl v-model="form.start" type="date" :error="form.errors.start">
+                        <div class="text-red-400 text-sm" v-if="form.errors.start">
+                            {{ form.errors.start }}
+                        </div>
+                    </FormControl>
+                </FormField>
+
+                <FormField label="End Date" :class="{ 'text-red-400': form.errors.end }">
+                    <FormControl v-model="form.end" type="date" :error="form.errors.end">
+                        <div class="text-red-400 text-sm" v-if="form.errors.end">
+                            {{ form.errors.end }}
+                        </div>
+                    </FormControl>
+                </FormField>
                 <FormField label="Scope Of Service" :class="{ 'text-red-400': form.errors.scope }">
                     <FormControl v-model="form.scope" type="select" name="label" placeholder="--Select Service Scope--"
                         :error="form.errors.scope" :options="scopes">
@@ -216,45 +357,29 @@ const form = useForm({
                         </div>
                     </FormControl>
                 </FormField>
+                <div v-show="form.beneficiary === 6">
+                    <FormField label="Other Type Beneficiary" :class="{ 'text-red-400': form.errors.name }">
+                        <FormControl v-model="form.other_b" type="text" placeholder="Other" :error="form.errors.name">
+                            <div class="text-red-400 text-sm" v-if="form.errors.name">
+                                {{ form.errors.name }}
+                            </div>
+                        </FormControl>
+                    </FormField>
+                </div>
+                <FormField label="Beneficiary Estimates" :class="{ 'text-red-400': form.errors.estimates }">
+                    <FormControl v-model="form.estimates" type="number" :error="form.errors.estimates">
+                        <div class="text-red-400 text-sm" v-if="form.errors.estimates">
+                            {{ form.errors.estimates }}
+                        </div>
+                    </FormControl>
+                </FormField>
 
 
-
-                <FormField label="Number Of Beneficiaries/month" :class="{ 'text-red-400': form.errors.number }">
-                    <FormControl v-model="form.number" type="select" label="name"
-                        placeholder="--Select Beneficiary Target per Month--" :error="form.errors.number"
-                        :options="numbers">
-                        <div class="text-red-400 text-sm" v-if="form.errors.number">
+                <FormField label="Service Charge" :class="{ 'text-red-400': form.errors.charge }">
+                    <FormControl v-model="form.charge" type="select" label="name" placeholder="--Select Service Charge"
+                        :error="form.errors.charge" :options="charges">
+                        <div class="text-red-400 text-sm" v-if="form.errors.charge">
                             {{ form.errors.number }}
-                        </div>
-                    </FormControl>
-                </FormField>
-                <FormField label=" Locations  you operate in within the district"
-                    :class="{ 'text-red-400': form.errors.location }">
-                    <FormControl v-model="form.location" type="select" label="name"
-                        placeholder="--Select Number of location in operation--" :error="form.errors.location"
-                        :options="locations">
-                        <div class="text-red-400 text-sm" v-if="form.errors.location">
-                            {{ form.errors.location }}
-                        </div>
-                    </FormControl>
-                </FormField>
-
-                <FormField label="Challenges Faced" :class="{ 'text-red-400': form.errors.challenges }">
-                    <FormControl v-model="form.challenges" type="textarea" placeholder="Write Challenges faced"
-                        :error="form.errors.challenges">
-                        <div class="text-red-400 text-sm" v-if="form.errors.challenges">
-                            {{ form.errors.challenges }}
-                        </div>
-                    </FormControl>
-                </FormField>
-
-
-                <FormField label="Are there any unique services you offer that others do not"
-                    :class="{ 'text-red-400': form.errors.unique }">
-                    <FormControl v-model="form.unique" type="textarea" placeholder="Write unique services offered"
-                        :error="form.errors.unique">
-                        <div class="text-red-400 text-sm" v-if="form.errors.unique">
-                            {{ form.errors.unique }}
                         </div>
                     </FormControl>
                 </FormField>

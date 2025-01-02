@@ -147,6 +147,7 @@ const form = useForm({
     description: null,
 
     district:null,
+    ta: null,
     organization:null,
     type:null,
     scope: null,
@@ -161,7 +162,7 @@ const form = useForm({
     latitude: null,
     longitude: null,
     coordinates:[],
-    ta:null,
+
     other_b:null
 
 
@@ -224,7 +225,7 @@ else{
                 </FormField>
 
                 <FormField label="Service Description" :class="{ 'text-red-400': form.errors.description }">
-                    <FormControl v-model="form.description" type="number" :error="form.errors.description">
+                    <FormControl v-model="form.description" type="text" :error="form.errors.description">
                         <div class="text-red-400 text-sm" v-if="form.errors.description">
                             {{ form.errors.description}}
                         </div>
@@ -269,7 +270,17 @@ else{
                     </FormControl>
                 </FormField>
 
-                <div>
+                <FormField label="Service Type" :class="{ 'text-red-400': form.errors.type }">
+
+                    <FormControl v-model="form.type" type="select" label="name" placeholder="--Select Service Type--"
+                        :error="form.errors.type" :options="types">
+                        <div class="text-red-400 text-sm" v-if="form.errors.type">
+                            {{ form.errors.type }}
+                        </div>
+                    </FormControl>
+                </FormField>
+                <!--multiple selection hidden-->
+                <!--div>
                     <FormField label="Service Type" :class="{ 'text-red-400': form.errors.start }">
                         <VueMultiselect v-model="form.type" :options="types" :multiple="true" :close-on-select="true"
                             placeholder="--Select Service Type--" label="name" track-by="name"
@@ -280,7 +291,7 @@ else{
 
                     </div>
 
-                </div>
+                </div-->
 
 
                 <FormField label="Start Date" :class="{ 'text-red-400': form.errors.start }">

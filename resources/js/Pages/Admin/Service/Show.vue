@@ -94,11 +94,12 @@ const props = defineProps({
 })
 
 const form = useForm({
-
+service_name: props.service.service_name,
 
     coordinates: [],
 
 })
+console.log(props.service)
 </script>
 
 <template>
@@ -124,10 +125,10 @@ const form = useForm({
                   hidden
                   lg:block
                 ">
-                                Name
+                                Service Name
                             </td>
-                            <td data-label="Name">
-                                {{ service.name }}
+                            <td data-label="Service Name">
+                                {{ service.service_name }}
                             </td>
                         </tr>
 
@@ -143,8 +144,39 @@ const form = useForm({
                 ">
                                 Organization
                             </td>
-                            <td data-label="Name">
-                                {{ service.organization_name }}
+                            <td data-label="Organization">
+                                {{ service.organization }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                District
+                            </td>
+                            <td data-label="District">
+                                {{ service.district }}[{{ service.areas }}]
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                Service Type
+                            </td>
+                            <td data-label="Service Type">
+                                {{ service.type }}
                             </td>
                         </tr>
 
@@ -158,27 +190,10 @@ const form = useForm({
                   hidden
                   lg:block
                 ">
-                                Type
+                                Service Scope
                             </td>
-                            <td data-label="Name">
-                                {{ service.service_type }}
-                            </td>
-                        </tr>
-
-
-                        <tr>
-                            <td class="
-                  p-4
-                  pl-8
-                  text-slate-500
-                  dark:text-slate-400
-                  hidden
-                  lg:block
-                ">
-                                Scope
-                            </td>
-                            <td data-label="Name">
-                                {{ service.service_scope }}
+                            <td data-label="Service Scope">
+                                {{ service.scope }}
                             </td>
                         </tr>
 
@@ -195,11 +210,9 @@ const form = useForm({
                                 Beneficiary Type
                             </td>
                             <td data-label="Name">
-                                {{ service.type_of_beneficiary }}
+                                {{ service.beneficiary }}
                             </td>
                         </tr>
-
-
 
 
                         <tr>
@@ -211,13 +224,44 @@ const form = useForm({
                   hidden
                   lg:block
                 ">
-                                Challenges
+                                Beneficiary Number
                             </td>
-                            <td data-label="Name">
-                                {{ service.challenges_faced }}
+                            <td data-label="Beneficiary Number">
+                                {{ service.number_of_beneficiary }}
                             </td>
                         </tr>
 
+
+                        <tr>
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                Start Date
+                            </td>
+                            <td data-label="Start Date">
+                                {{ service.start_date ??"N/A"}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                End Date
+                            </td>
+                            <td data-label="End Date">
+                                {{ service.end_date ?? "N/A" }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </CardBox>

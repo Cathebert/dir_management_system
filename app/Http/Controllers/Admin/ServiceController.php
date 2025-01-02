@@ -20,8 +20,12 @@ class ServiceController extends Controller
     public function index()
     {
       $this->authorize('adminViewAny', Service::class);
-        $organizations = (new Service)->newQuery();
+      /*   $organizations = Service::query()
+                            ->with('organization')
+                            ->with('district')
+                            ->with('beneficiary');
 
+        dd($organizations);
         if (request()->has('search')) {
             $organizations->where('name', 'Like', '%'.request()->input('search').'%');
         }
@@ -36,10 +40,41 @@ class ServiceController extends Controller
             $organizations->orderBy($attribute, $sort_order);
         } else {
             $organizations->latest();
-        }
+        } */
+ $service=DB::table('services as s')
+                ->join('organizations as o','s.organization_id','=','o.id')
+                ->join('districts as d','s.district_id','=','d.id')
+                ->join('service_sectors as ss','s.service_sector_id','=','ss.id')
+                ->join('service_charges as sc','s.service_charge_id','=','sc.id')
+                ->join('service_scopes as scp','s.service_scope','=','scp.id')
+                ->join('beneficiaries as b','s.beneficiary_id','=','b.id')
+                ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','d.name as district','ss.name as service_type','sc.name as charge','scp.name as service_scope','b.name as beneficiary','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
+                ->orderBy('s.id','DESC');
 
-       $organizations =  $organizations->paginate(config('admin.paginate.per_page'))
-            ->onEachSide(config('admin.paginate.each_side'));
+  if (request()->query('sort')) {
+     $service=DB::table('services as s')
+                ->join('organizations as o','s.organization_id','=','o.id')
+                ->join('districts as d','s.district_id','=','d.id')
+                ->join('service_sectors as ss','s.service_sector_id','=','ss.id')
+                ->join('service_charges as sc','s.service_charge_id','=','sc.id')
+                ->join('service_scopes as scp','s.service_scope','=','scp.id')
+                ->join('beneficiaries as b','s.beneficiary_id','=','b.id')
+                ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','d.name as district','ss.name as service_type','sc.name as charge','scp.name as service_scope','b.name as beneficiary','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
+;
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            //dd(request()->query('sort'));
+           $service->orderBy($attribute, $sort_order);
+        }
+           if (request()->has('search')) {
+            $service->where('s.name', 'Like', '%'.request()->input('search').'%');
+        }
+       $organizations =  $service->paginate(config('admin.paginate.per_page'))
+       ->onEachSide(config('admin.paginate.each_side'));
 
 
         return Inertia::render('Admin/Service/Index', [
@@ -94,34 +129,39 @@ foreach($names as $district){
     public function store(Request $request)
     {
 
-dd($request);
+        //$this->authorize('adminCreate', Service::class);
          $request->validate([
         'name' => 'required',
-        'start'=>'required',
-        'organization'=>'required'
+         'end'   => 'required',
+         'start' => 'required|before:end',
+        'organization'=>'required',
+        'district'=>'required',
 
 
     ]);
        try {
 DB::beginTransaction();
-       $org=Organization::where('name',$request->organization)->select('id')->first();
+
        $service=new Service();
-       $service->organization_id=$org->id;
-       $service->district=$request->district;
-       $service->organization_name=$request->organization;
-       $service->name=$request->name;
-       $service->service_type=$request->type;
+        $service->name=$request->name;
+        $service->description=$request->description;
+       $service->organization_id=$request->organization;
+       $service->district_id=$request->district;
+        $service->beneficiary_id=$request->beneficiary;
+        $service->service_sector_id=$request->type;
        $service->service_scope=$request->scope;
-       $service->type_of_beneficiary=$request->beneficiary;
+       $service->areas=$request->ta;
+       $service->service_charge_id=$request->charge;
+       $service->start_date=$request->start;
+       $service->end_date=$request->end;
        $service->number_of_beneficiary=$request->number;
-       $service->unique_services=$request->unique;
-       $service->number_service_location=$request->location;
-       $service->challenges_faced=$request->challenges;
+       $service->created_at=now();
+       $service->updated_at=NULL;
 
        $service->save();
        $service_id=$service->id;
       // dd($request->coordinates[1]['lng']);
-if(count($request->coordinates)>0){
+if(!empty($request->coordinates) && count($request->coordinates)>0){
     for($i=0;   $i < count($request->coordinates); $i++){
     $location=new Location();
 $location->service_id= $service_id;
@@ -132,7 +172,18 @@ $location->updated_at=NULL;
 $location->save();
     }
 }
-//DB::commit();
+if($request->other_b!=null){
+    DB::table('type_other')->insert(
+    [
+     'service_id' => $service_id,
+     'name' =>$request->other_b,
+     'created_at'=>now(),
+     'updated_at'=>NULL,
+     ]
+);
+
+}
+DB::commit();
          return redirect()->route('admin.service.index')
             ->with('message', __('Service created successfully.'));
        } catch (Exception $e) {
@@ -150,7 +201,20 @@ $location->save();
     public function show($id)
     {
 
-        $service = Service::findOrFail($id);
+       // $service = Service::findOrFail($id);
+        $service=DB::table('services as s')
+                ->join('organizations as o','s.organization_id','=','o.id')
+                ->join('districts as d','s.district_id','=','d.id')
+                ->join('service_sectors as ss','s.service_sector_id','=','ss.id')
+                ->join('service_charges as sc','s.service_charge_id','=','sc.id')
+                ->join('service_scopes as scp','s.service_scope','=','scp.id')
+                ->join('beneficiaries as b','s.beneficiary_id','=','b.id')
+                ->join('district_traditionals as dt','s.areas','=','dt.id')
+                ->select('s.id as id','s.name as service_name','s.description','o.name as organization','d.name as district','ss.name as type','sc.name as charge','scp.name as scope','b.name as beneficiary','s.start_date','s.end_date','dt.name as areas','s.number_of_beneficiary','s.created_at','s.updated_at')
+                ->where('s.id',$id)
+                ->first();
+
+//dd($service);
 $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->get();
         $this->authorize('adminView',  $service);
 
@@ -165,18 +229,31 @@ $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->
      */
     public function edit($id)
     {
-           $organization= Service::findOrFail($id);
-        $this->authorize('adminUpdate', $organization);
+           $service= Service::findOrFail($id);
+           $organizations= Organization::select('id','name')->get();
+            $organization= Organization::where('id',$service->organization_id)->select('id','name')->first();
+        $this->authorize('adminUpdate', $service);
 $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->get();
-
-    $types=array('Health','Education','Social Protection','Nutrition','Water, Sanitation, and Hygiene (WASH)','Economic Empowerment','Financial Inclusion','Other (Specify)');
-        $scope=array('Preventive','Curative','Supportive','Advocacy','Capacity Building','Other(Specify)');
-        $beneficies=array('Children','Women','Elderly','Disabled','Youth','Other(Specify)');
+$districts=DB::table('districts')->get();
+$selected=District::where('id',$service->district_id)->first();
+$tas=DB::table('district_traditionals')->where('district_id',$service->district_id)->get();
+$ta=DB::table('district_traditionals')->where('id',$service->areas)->first();
+        //dd($typeOptions);
+   $types=DB::table('service_sectors')->get();
+        $scope=DB::table('service_scopes')->get();
+        $beneficies=DB::table('beneficiaries')->get();
+        $charges=DB::table('service_charges')->get();
         $number=array('<100','100-500','501-1000','>1000');
         $locations=array('1','2-3','4-5','More than 5');
         return Inertia::render('Admin/Service/Edit', [
-            'organization' => $organization,
-             'types'=>$types,
+            'service' => $service,
+            'organizations' =>$organizations,
+            'organization'=>$organization,
+            'districts'=>$districts,
+            'tas'=>$tas,
+            'charges'=>$charges,
+            'district'=>$selected,
+            'types'=>$types,
             'scopes'=>$scope,
             'beneficies'=>$beneficies,
             'numbers'=>$number,
@@ -195,13 +272,18 @@ $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->
 
     $service->update([
     'name'=>$request->name,
-    'service_type'=>$request->type,
+    'description'=>$request->description,
+    'organization_id'=>$request->organization,
+    'district_id'=>$request->district,
+    'beneficiary_id'=>$request->beneficiary,
+    'service_sector_id'=>$request->type,
+    'areas'=>$request->ta,
+    'service_charge_id'=>$request->charge,
     'service_scope'=>$request->scope,
-    'type_of_beneficiary'=>$request->beneficiary,
+    'start_date'=>$request->start,
     'number_of_beneficiary'=>$request->number,
-    'unique_services'=>$request->unique,
-    'number_service_location'=>$request->location,
-    'challenges_faced'=>$request->challenges,
+    'end_date'=>$request->end,
+
        ]);
 $service_id=$service->id;
              if(count($request->coordinates)>0){

@@ -87,7 +87,7 @@ function destroy(id) {
                         <tr>
                             <th>ID</th>
                             <th>
-                                <Sort label="Name" attribute="name" />
+                                <Sort label="Name" attribute="s.name" />
                             </th>
                             <th>District</th>
                             <th>Organization</th>
@@ -95,8 +95,10 @@ function destroy(id) {
                             <th>Service Scope</th>
                             <th>Beneficiary Type</th>
                             <th>Beneficiary #</th>
+                            <th>Started Date</th>
+                            <th>End Date</th>
                             <th>Map</th>
-                            <th>Challenges</th>
+
 
                             <th v-if="can.edit || can.delete">Actions</th>
                         </tr>
@@ -117,7 +119,7 @@ function destroy(id) {
                     text-cyan-600
                     dark:text-cyan-400
                   ">
-                                {{ organization.name }}
+                                {{ organization.service_name }}
                                 </Link>
                             </td>
 
@@ -139,10 +141,16 @@ function destroy(id) {
                                 {{ organization.service_scope }}
                             </td>
                             <td>
-                                {{ organization.type_of_beneficiary }}
+                                {{ organization.beneficiary }}
                             </td>
                             <td>
                                 {{ organization.number_of_beneficiary }}
+                            </td>
+                            <td>
+                                {{ organization.start_date ?? 'N/A' }}
+                            </td>
+                            <td>
+                                {{ organization.end_date??'N/A' }}
                             </td>
                             <td data-label="URL">
                                 <div class="w-12 rounded">
@@ -163,9 +171,7 @@ function destroy(id) {
 
                                 </div>
                             </td>
-                            <td>
-                                {{ organization.challenges_faced }}
-                            </td>
+
                             <td v-if="can.edit || can.delete" class="before:hidden lg:w-1 whitespace-nowrap">
                                 <BaseButtons type="justify-start lg:justify-end" no-wrap>
                                     <BaseButton v-if="can.edit"

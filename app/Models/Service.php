@@ -8,7 +8,7 @@ class Service extends Model
 {
     //mass assaignment
 
-      protected $fillable = ['name', 'service_type', 'service_scope', 'type_of_beneficiary', 'number_of_beneficiary',
+      protected $fillable = ['organization_id','district_id','name', 'description','service_type', 'service_scope', 'type_of_beneficiary', 'number_of_beneficiary',
                             'unique_services', 'number_service_location', 'challenges_faced'
                           ];
 
@@ -16,4 +16,15 @@ class Service extends Model
 {
     return $this->belongsTo(Organization::class);
 }
+public function district(): BelongsTo
+{
+    return $this->belongsTo(District::class);
+}
+public function beneficiary(): BelongsTo
+{
+    return $this->belongsTo(Beneficiary::class);
+}
+
+
+
 }
