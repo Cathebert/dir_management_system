@@ -130,25 +130,39 @@ const props = defineProps({
             type: Object,
             default: () => ({}),
         },
-
+    selected_type:{
+    type: Object,
+    default: () => ({}),
+},
         scopes: {
             type: Array,
             default: () => ({}),
         },
-
-        beneficies: {
+    scope_selected: {
+        type: Array,
+        default: () => ({}),
+    },
+    beneficiaries: {
             type: Array,
             default: () => ({}),
         },
+    beneficiary_selected: {
+        type: Array,
+        default: () => ({}),
+    },
         numbers: {
             type: Array,
             default: () => ({}),
         },
 
-        charges: {
+    charges: {
             type: Array,
             default: () => ({}),
         },
+    charge_selected: {
+        type: Array,
+        default: () => ({}),
+    },
         locations: {
             type: Array,
             default: () => ({}),
@@ -181,12 +195,12 @@ const form = useForm({
     district: props.districts.id ?? props.district.id,
     organization:props.organizations.id ?? props.organization.id,
     ta: props.tas.id??props.service.ta,
-    type: null,
-    scope: null,
-    beneficiary: null,
+    type: props.types.id??props.selected_type.id,
+    scope: props.scopes.id??props.scope_selected.id,
+    beneficiary: props.beneficiaries.id ?? props.beneficiary_selected.id,
     start: props.service.start_date,
     end: props.service.end_date,
-    charge: null,
+    charge: props.charges.id??props.charge_selected.charge,
     number: props.service.number_of_beneficiary,
     unique: null,
     location: null,
@@ -194,10 +208,9 @@ const form = useForm({
     latitude: null,
     longitude: null,
     coordinates: [],
-
     other_b: null
 })
-form.beneficiary = ref();
+
 
 
 function getTAs(id) {
@@ -233,7 +246,7 @@ function getTAs(id) {
                 <BaseButton :route-name="route('admin.service.index')" :icon="mdiArrowLeftBoldOutline" label="Back"
                     color="white" rounded-full small />
             </SectionTitleLineWithButton>
-            <CardBox form @submit.prevent="form.post(route('admin.service.update', props.organization.id))">
+            <CardBox form @submit.prevent="form.post(route('admin.service.update', props.service.id))">
                 <!--- <FormField label="Name" :class="{ 'text-red-400': form.errors.type }">
                     <FormControl v-model="form.type" type="select" placeholder="--Select Type--"
                         :error="form.errors.type" :options="typeOptions">
@@ -292,13 +305,7 @@ function getTAs(id) {
                         </div>
                     </FormControl>
                 </FormField>
-                <FormField label="Number projects" :class="{ 'text-red-400': form.errors.number }">
-                    <FormControl v-model="form.number" type="number" :error="form.errors.number">
-                        <div class="text-red-400 text-sm" v-if="form.errors.number">
-                            {{ form.errors.number }}
-                        </div>
-                    </FormControl>
-                </FormField>
+
 
                 <FormField label="Service Type" :class="{ 'text-red-400': form.errors.type }">
 
@@ -324,13 +331,7 @@ function getTAs(id) {
                 </div-->
 
 
-                <FormField label="Start Date" :class="{ 'text-red-400': form.errors.start }">
-                    <FormControl v-model="form.start" type="date" :error="form.errors.start">
-                        <div class="text-red-400 text-sm" v-if="form.errors.start">
-                            {{ form.errors.start }}
-                        </div>
-                    </FormControl>
-                </FormField>
+
 
                 <FormField label="End Date" :class="{ 'text-red-400': form.errors.end }">
                     <FormControl v-model="form.end" type="date" :error="form.errors.end">
@@ -350,8 +351,8 @@ function getTAs(id) {
 
 
                 <FormField label="Type Of Beneficiary" :class="{ 'text-red-400': form.errors.beneficiary }">
-                    <FormControl v-model="form.beneficiary" type="select" label="name"
-                        placeholder="--Select Beneficiary--" :error="form.errors.beneficiary" :options="beneficies">
+                    <FormControl v-model="form.beneficiary" type="select" label="Type Of Beneficiary"
+                        placeholder="--Select Beneficiary--" :error="form.errors.beneficiary" :options="beneficiaries">
                         <div class="text-red-400 text-sm" v-if="form.errors.beneficiary">
                             {{ form.errors.beneficiary }}
                         </div>
@@ -366,17 +367,17 @@ function getTAs(id) {
                         </FormControl>
                     </FormField>
                 </div>
-                <FormField label="Beneficiary Estimates" :class="{ 'text-red-400': form.errors.estimates }">
-                    <FormControl v-model="form.estimates" type="number" :error="form.errors.estimates">
-                        <div class="text-red-400 text-sm" v-if="form.errors.estimates">
-                            {{ form.errors.estimates }}
+                <FormField label="Beneficiary Estimates" :class="{ 'text-red-400': form.errors.number }">
+                    <FormControl v-model="form.number" type="number" :error="form.errors.number">
+                        <div class="text-red-400 text-sm" v-if="form.errors.number">
+                            {{ form.errors.number }}
                         </div>
                     </FormControl>
                 </FormField>
 
 
                 <FormField label="Service Charge" :class="{ 'text-red-400': form.errors.charge }">
-                    <FormControl v-model="form.charge" type="select" label="name" placeholder="--Select Service Charge"
+                    <FormControl v-model="form.charge" type="select" label="Service Charge" placeholder="--Select Service Charge"
                         :error="form.errors.charge" :options="charges">
                         <div class="text-red-400 text-sm" v-if="form.errors.charge">
                             {{ form.errors.number }}

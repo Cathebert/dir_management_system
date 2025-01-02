@@ -214,7 +214,9 @@ DB::commit();
                 ->where('s.id',$id)
                 ->first();
 
-//dd($service);
+if($service==null){
+    $service = Service::findOrFail($id);
+}
 $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->get();
         $this->authorize('adminView',  $service);
 
@@ -240,9 +242,13 @@ $tas=DB::table('district_traditionals')->where('district_id',$service->district_
 $ta=DB::table('district_traditionals')->where('id',$service->areas)->first();
         //dd($typeOptions);
    $types=DB::table('service_sectors')->get();
+   $selected_type=DB::table('service_sectors')->where('id',$service->service_sector_id)->select('id','name')->first();
         $scope=DB::table('service_scopes')->get();
+        $scope_selected=DB::table('service_scopes')->where('id',$service->service_scope)->select('id','name')->first();
         $beneficies=DB::table('beneficiaries')->get();
-        $charges=DB::table('service_charges')->get();
+        $beneficiary_selected=DB::table('beneficiaries')->where('id',$service->beneficiary_id)->select('id','name')->first();
+        $charges= DB::table('service_charges')->get();
+        $charge_selected= DB::table('service_charges')->where('id',$service->service_charge_id)->select('id','name')->first();
         $number=array('<100','100-500','501-1000','>1000');
         $locations=array('1','2-3','4-5','More than 5');
         return Inertia::render('Admin/Service/Edit', [
@@ -252,10 +258,14 @@ $ta=DB::table('district_traditionals')->where('id',$service->areas)->first();
             'districts'=>$districts,
             'tas'=>$tas,
             'charges'=>$charges,
+            'charge_selected'=>$charge_selected,
             'district'=>$selected,
             'types'=>$types,
+            'selected_type'=>$selected_type,
             'scopes'=>$scope,
-            'beneficies'=>$beneficies,
+            'scope_selected'=>$scope_selected,
+            'beneficiaries'=>$beneficies,
+            'beneficiary_selected'=>$beneficiary_selected,
             'numbers'=>$number,
             'locations'=>$locations,
             'coordinates'=>$coordinates,
@@ -274,15 +284,14 @@ $ta=DB::table('district_traditionals')->where('id',$service->areas)->first();
     'name'=>$request->name,
     'description'=>$request->description,
     'organization_id'=>$request->organization,
+    'end_date'=>$request->end,
     'district_id'=>$request->district,
     'beneficiary_id'=>$request->beneficiary,
     'service_sector_id'=>$request->type,
     'areas'=>$request->ta,
     'service_charge_id'=>$request->charge,
     'service_scope'=>$request->scope,
-    'start_date'=>$request->start,
     'number_of_beneficiary'=>$request->number,
-    'end_date'=>$request->end,
 
        ]);
 $service_id=$service->id;

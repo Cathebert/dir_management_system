@@ -128,7 +128,7 @@ console.log(props.service)
                                 Service Name
                             </td>
                             <td data-label="Service Name">
-                                {{ service.service_name }}
+                                {{ service.service_name ?? service.name }}
                             </td>
                         </tr>
 
