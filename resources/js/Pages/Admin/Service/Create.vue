@@ -137,8 +137,12 @@ const props = defineProps({
 tas:{
     type: Object,
     default: () => ({}),
-}
+},
 
+is_other: {
+    type: Boolean,
+    default: false
+}
 })
 let tal=new Array();
 const form = useForm({
@@ -148,6 +152,7 @@ const form = useForm({
 
     district:null,
     ta: null,
+    specific_area:null,
     organization:null,
     type:null,
     scope: null,
@@ -162,6 +167,7 @@ const form = useForm({
     latitude: null,
     longitude: null,
     coordinates:[],
+    is_other: props.is_other,
 
     other_b:null
 
@@ -169,6 +175,7 @@ const form = useForm({
 })
 form.beneficiary = ref();
 const activeColor = ref('black')
+
 
 
 
@@ -191,8 +198,21 @@ else{
         TAs=[]
 
 }
-}
 
+}
+function showOther(value) {
+    var val = value.find((item) => item.id === 6);
+
+    if(val){
+      form.is_other = true
+
+    }
+    else{
+        form.is_other = false
+
+    }
+    console.log(form.is_other)
+}
 
 
 </script>
@@ -244,7 +264,7 @@ else{
                     </FormControl>
 
                 </FormField>
-                <FormField label="District" :class="{ 'text-red-400': form.errors.district }">
+                <FormField label="Location" :class="{ 'text-red-400': form.errors.district }">
 
                     <FormControl v-model="form.district" type="select" label="name" placeholder="--Select District--"
                         :error="form.errors.district" :options="districts" @update:modelValue="getTAs($event)">
@@ -262,13 +282,16 @@ else{
                         </div>
                     </FormControl>
                 </FormField>
-                <FormField label="Number projects" :class="{ 'text-red-400': form.errors.number }">
-                    <FormControl v-model="form.number" type="number" :error="form.errors.number">
-                        <div class="text-red-400 text-sm" v-if="form.errors.number">
-                            {{ form.errors.number }}
+                <FormField label="Specific Area within district" :class="{ 'text-red-400': form.errors.district }">
+                    <FormControl v-model="form.specific_area" type="textarea" label="Specific Area"
+                        :error="form.errors.specific_area" placeholder="Enter Specific Areas within the district">
+                        <div class="text-red-400 text-sm" v-if="form.errors.specific_area">
+                            {{ form.errors.district }}
                         </div>
                     </FormControl>
                 </FormField>
+
+
 
                 <FormField label="Service Type" :class="{ 'text-red-400': form.errors.type }">
 
@@ -318,16 +341,30 @@ else{
                     </FormControl>
                 </FormField>
 
+                <div>
+                    <FormField label="Type Of Beneficiary" :class="{ 'text-red-400': form.errors.beneficiary }">
+                        <VueMultiselect v-model="form.beneficiary" :options="beneficies" :multiple="true"
+                            :close-on-select="true" placeholder="--Select Type of Beneficiaries--" label="name"
+                            track-by="id" @update:modelValue="showOther($event)"
+                            :style="{ 'background-color' : activeColor }" />
+                    </FormField>
+                    <div class="text-red-400 text-sm" v-if="form.errors.beneficiary">
+                        {{ form.errors.beneficiary}}
 
-                <FormField label="Type Of Beneficiary" :class="{ 'text-red-400': form.errors.beneficiary }">
+                    </div>
+
+                </div>
+                &nbsp;
+                <!--FormField label="Type Of Beneficiary" :class="{ 'text-red-400': form.errors.beneficiary }">
                     <FormControl v-model="form.beneficiary" type="select" label="name"
                         placeholder="--Select Beneficiary--" :error="form.errors.beneficiary" :options="beneficies">
                         <div class="text-red-400 text-sm" v-if="form.errors.beneficiary">
                             {{ form.errors.beneficiary }}
                         </div>
                     </FormControl>
-                </FormField>
-                <div v-show="form.beneficiary === 6">
+                </FormField>-->
+
+                <div v-if="form.is_other">
                     <FormField label="Other Type Beneficiary" :class="{ 'text-red-400': form.errors.name }">
                         <FormControl v-model="form.other_b" type="text" placeholder="Other" :error="form.errors.name">
                             <div class="text-red-400 text-sm" v-if="form.errors.name">
@@ -336,10 +373,10 @@ else{
                         </FormControl>
                     </FormField>
                 </div>
-                <FormField label="Beneficiary Estimates" :class="{ 'text-red-400': form.errors.estimates }">
-                    <FormControl v-model="form.estimates" type="number" :error="form.errors.estimates">
-                        <div class="text-red-400 text-sm" v-if="form.errors.estimates">
-                            {{ form.errors.estimates }}
+                <FormField label="Beneficiary Estimates" :class="{ 'text-red-400': form.errors.number }">
+                    <FormControl v-model="form.number" type="number" :error="form.errors.number">
+                        <div class="text-red-400 text-sm" v-if="form.errors.number">
+                            {{ form.errors.number }}
                         </div>
                     </FormControl>
                 </FormField>

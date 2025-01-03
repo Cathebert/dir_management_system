@@ -14,9 +14,14 @@ import FormControl from '@/Components/FormControl.vue'
 
 import BaseButton from '@/Components/BaseButton.vue'
 import BaseButtons from '@/Components/BaseButtons.vue'
+import VueMultiselect from 'vue-multiselect'
 
 const props = defineProps({
     typeOptions: {
+        type: Object,
+        default: () => ({}),
+    },
+    sectors: {
         type: Object,
         default: () => ({}),
     },
@@ -27,6 +32,7 @@ const form = useForm({
     name:null,
     type:null,
     description:null,
+    sector:[],
     email:null,
     address:null,
     phone:null,
@@ -71,7 +77,19 @@ const form = useForm({
                     </FormControl>
                 </FormField>
 
+                <div>
+                    <FormField label="Organization Sector" :class="{ 'text-red-400': form.errors.sector }">
+                        <VueMultiselect v-model="form.sector" :options="sectors" :multiple="true"
+                            :close-on-select="true" placeholder="--Select Organization sectors--" label="name"
+                            track-by="name" :style="{ 'background-color' : activeColor }" />
+                    </FormField>
+                    <div class="text-red-400 text-sm" v-if="form.errors.sector">
+                        {{ form.errors.sector }}
 
+                    </div>
+
+                </div>
+                &nbsp;&nbsp;
                 <FormField label="URL" :class="{ 'text-red-400': form.errors.url }">
                     <FormControl v-model="form.url" type="text" placeholder="e.g: https://www.indemw.tech"
                         :error="form.errors.url">

@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use DB;
 
 class OrganizationController extends Controller
 {
@@ -60,11 +61,12 @@ class OrganizationController extends Controller
     public function create()
     {
         //
-          $this->authorize('adminCreate', Media::class);
+        $this->authorize('adminCreate', Media::class);
         $org_type= OrganizationType::get();
-
+        $org_sector=DB::table('service_sectors')->select('id','name')->get();
         return Inertia::render('Admin/Organisation/Create', [
             'typeOptions' => $org_type,
+            'sectors' => $org_sector,
         ]);
     }
 
@@ -73,13 +75,16 @@ class OrganizationController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('adminCreate', Organization::class);
          $request->validate([
         'name' => 'required',
+        'sector' => 'required',
 
 
     ]);
-    $logo='/logo/logo.png';
 
+    $logo='/logo/logo.png';
+try{
     if($request->hasFile('file')){
 $filename = time() . '.' . $request->file->extension();
 $logo='/logo/'.$filename;
@@ -96,11 +101,27 @@ $organization->logo=$logo;
 $organization->email=$request->email;
 $organization->created_at=now();
 $organization->updated_at=NULL;
-
 $organization->save();
+$org_id=$organization->id;
+
+if(count($request->sector)>0){
+foreach ($request->sector as $key => $value) {
+DB::table('organization_service_sector')->insert([
+'organization_id'=>$org_id,
+'sector_id'=>$value['id'],
+'created_at'=>now(),
+
+]);
+}
+}
+
+
 
         return redirect()->route('admin.organization.index')
             ->with('message', __('Organization created successfully.'));
+}catch(\Exception $e){
+return redirect()->back()->with('error', "Failed to create organization");
+}
     }
 
     /**
@@ -119,11 +140,17 @@ $organization->save();
        $organization= Organization::findOrFail($id);
         $this->authorize('adminUpdate', $organization);
  $typeOptions = OrganizationType::get();
+ $sectors=DB::table('service_sectors')->select('id','name')->get();
+ $sector_selected=DB::table('organization_service_sector')->where('organization_id',$id)->pluck('sector_id')->toArray();
+$chosen_sector=DB::table('service_sectors')->whereIn('id',$sector_selected)->select('id','name')->get();
+
 $selected=OrganizationType::where('id',$organization->organization_type_id)->first();
         return Inertia::render('Admin/Organisation/Edit', [
             'organization' => $organization,
              'typeOptions' => $typeOptions,
              'selected'=>$selected,
+             'sector_selected'=>$chosen_sector,
+              'sectors'=>$sectors,
 
         ]);
     }
@@ -133,7 +160,7 @@ $selected=OrganizationType::where('id',$organization->organization_type_id)->fir
      */
     public function update(Request $request,$id)
     {
-
+dd($request->all());
 
         $name=$request->name;
         $description=$request->description;
@@ -166,6 +193,19 @@ $logo='/logo/'.$filename;
 'address'=>$address,
 'email'=>$email
       ]);
+
+
+if(count($request->sector)>0){
+   DB::table('organization_service_sector')->where('organization_id',$id)->delete();
+foreach ($request->sector as $key => $value) {
+DB::table('organization_service_sector')->insert([
+'organization_id'=>$id,
+'sector_id'=>$value['id'],
+'created_at'=>now(),
+
+]);
+}
+}
         $this->authorize('adminUpdate',  $organization);
 
 

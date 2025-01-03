@@ -12,7 +12,7 @@ import FormField from '@/Components/FormField.vue'
 import FormControl from '@/Components/FormControl.vue'
 import BaseButton from '@/Components/BaseButton.vue'
 import BaseButtons from '@/Components/BaseButtons.vue'
-
+import VueMultiselect from 'vue-multiselect'
 const props = defineProps({
     organization: {
         type: Object,
@@ -26,6 +26,14 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    sectors: {
+        type: Object,
+        default: () => ({}),
+    },
+    sector_selected:{
+        type: Object,
+        default: () => ({}),
+    }
 })
 
 const form = useForm({
@@ -33,12 +41,14 @@ const form = useForm({
     name: props.organization.name,
     type: props.typeOptions.id??props.selected.id,
     description: props.organization.description,
+    sector: props.sector_selected??props.sectors,
     url: props.organization.url,
     phone:props.organization.phone,
     address:props.organization.address,
     email:props.organization.email,
-    file: props.organization.logo,
+    file:null,
 })
+
 </script>
 
 <template>
@@ -66,9 +76,9 @@ const form = useForm({
                         </div>
                     </FormControl>
                 </FormField>
-                 <FormField label="Type" :class="{ 'text-red-400': form.errors.type }">
+                <FormField label="Type" :class="{ 'text-red-400': form.errors.type }">
                     <FormControl v-model="form.type" type="select" placeholder="--Select Type--"
-                        :error="form.errors.type" :options="typeOptions"  >
+                        :error="form.errors.type" :options="typeOptions">
                         <div class="text-red-400 text-sm" v-if="form.errors.type">
                             {{ form.errors.type }}
                         </div>
@@ -100,6 +110,21 @@ const form = useForm({
                     </FormControl>
                 </FormField>
 
+                <div>
+                    <FormField label="Organization Sector" :class="{ 'text-red-400': form.errors.sector}">
+                        <VueMultiselect v-model="form.sector" :options="sectors" :multiple="true"
+                            :close-on-select="true" placeholder="--Select Organization sectors--" label="name"
+                            track-by="name" :style="{ 'background-color': activeColor }" />
+                    </FormField>
+                    <div class="text-red-400 text-sm" v-if="form.errors.sector">
+                        {{ form.errors.sector }}
+
+                    </div>
+
+                </div>
+                &nbsp;&nbsp;
+
+
                 <FormField label="URL" :class="{ 'text-red-400': form.errors.url }">
                     <FormControl v-model="form.url" type="text" placeholder="Enter Url" :error="form.errors.url">
                         <div class="text-red-400 text-sm" v-if="form.errors.url">
@@ -124,7 +149,7 @@ const form = useForm({
                             class="block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800" />
                     </div>
                 </div>
-                <FormField label="file" :class="{ 'text-red-400': form.errors.file }">
+                <FormField label="Logo" :class="{ 'text-red-400': form.errors.file }">
                     <FormControl v-model="form.file" type="file" placeholder="Select File" :error="form.errors.file"
                         @input="form.file = $event.target.files[0]">
                         <div class="text-red-400 text-sm" v-if="form.errors.file">
