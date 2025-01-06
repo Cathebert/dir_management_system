@@ -129,7 +129,16 @@ return redirect()->back()->with('error', "Failed to create organization");
      */
     public function show(Organization $organization)
     {
-        //
+        $this->authorize('adminView', $organization);
+        $services= DB::table('services')
+        ->join('service_charges','services.service_charge_id','=','service_charges.id')
+        ->join('districts','services.district_id','=','districts.id')
+        ->select('services.*','service_charges.name as charge_name','districts.name as district_name')
+        ->where('organization_id',$organization->id)->get();
+        return Inertia::render('Admin/Organisation/Show', [
+            'organization' => $organization,
+            'services'=>$services,
+        ]);
     }
 
     /**

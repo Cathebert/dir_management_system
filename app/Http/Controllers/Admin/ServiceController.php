@@ -44,23 +44,22 @@ class ServiceController extends Controller
  $service=DB::table('services as s')
                 ->join('organizations as o','s.organization_id','=','o.id')
                 ->join('districts as d','s.district_id','=','d.id')
-                ->join('service_sectors as ss','s.service_sector_id','=','ss.id')
+
                 ->join('service_charges as sc','s.service_charge_id','=','sc.id')
-                ->join('service_scopes as scp','s.service_scope','=','scp.id')
-                ->join('beneficiaries as b','s.beneficiary_id','=','b.id')
-                ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','d.name as district','ss.name as service_type','sc.name as charge','scp.name as service_scope','b.name as beneficiary','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
+
+                ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','o.id as organization_id','d.name as district','sc.name as charge','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
                 ->orderBy('s.id','DESC');
 
   if (request()->query('sort')) {
      $service=DB::table('services as s')
                 ->join('organizations as o','s.organization_id','=','o.id')
                 ->join('districts as d','s.district_id','=','d.id')
-                ->join('service_sectors as ss','s.service_sector_id','=','ss.id')
+
                 ->join('service_charges as sc','s.service_charge_id','=','sc.id')
-                ->join('service_scopes as scp','s.service_scope','=','scp.id')
-                ->join('beneficiaries as b','s.beneficiary_id','=','b.id')
-                ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','d.name as district','ss.name as service_type','sc.name as charge','scp.name as service_scope','b.name as beneficiary','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
+
+                ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','o.id as organization_id','d.name as district','sc.name as charge','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
 ;
+
             $attribute = request()->query('sort');
             $sort_order = 'ASC';
             if (strncmp($attribute, '-', 1) === 0) {
@@ -106,7 +105,7 @@ foreach($names as $district){
         //dd($typeOptions);
         $types=DB::table('service_sectors')->get();
         $scope=DB::table('service_scopes')->get();
-        $beneficies=DB::table('beneficiaries')->get();
+        $beneficies=DB::table('beneficiaries')->select('id','name')->get();
         $charges=DB::table('service_charges')->get();
         $number=array('<100','100-500','501-1000','>1000');
         $locations=array('1','2-3','4-5','More than 5');
@@ -136,31 +135,50 @@ foreach($names as $district){
          'start' => 'required|before:end',
         'organization'=>'required',
         'district'=>'required',
+         'years_district'=> 'required|numeric|gt:0',
 
 
     ]);
+
        try {
 DB::beginTransaction();
+$tas=DB::table('district_traditionals')->where('id',$request->ta)->select('name')->first();
+$is_available=DB::table('year_organization_district')->where('district_id',$request->district)->where('organization_id',$request->organization)->first();
 
-       $service=new Service();
+$service=new Service();
         $service->name=$request->name;
         $service->description=$request->description;
-       $service->organization_id=$request->organization;
-       $service->district_id=$request->district;
-        $service->beneficiary_id=$request->beneficiary;
+        $service->organization_id=$request->organization;
+        $service->district_id=$request->district;
+        $service->areas=$request->ta;
+        $service->areas=$tas->name.'-'.$request->specific_area;
         $service->service_sector_id=$request->type;
-       $service->service_scope=$request->scope;
-       $service->areas=$request->ta;
-       $service->service_charge_id=$request->charge;
-       $service->start_date=$request->start;
-       $service->end_date=$request->end;
-       $service->number_of_beneficiary=$request->number;
-       $service->created_at=now();
-       $service->updated_at=NULL;
+        $service->service_scope=$request->scope;
 
-       $service->save();
-       $service_id=$service->id;
-      // dd($request->coordinates[1]['lng']);
+        $service->service_charge_id=$request->charge;
+        $service->start_date=$request->start;
+        $service->end_date=$request->end;
+        $service->number_of_beneficiary=$request->number;
+        $service->created_at=now();
+        $service->updated_at=NULL;
+
+        $service->save();
+        $service_id=$service->id;
+        /**
+         * store beneficiary if not empty
+         */
+        if(!empty($request->beneficiary) &&count($request->beneficiary)>0){
+            foreach ($request->beneficiary as $key => $value) {
+                DB::table('service_beneficiaries')->insert([
+                    'service_id'=>$service_id,
+                    'beneficiary_id'=>$value['id'],
+                    'created_at'=>now(),
+                ]);
+            }
+        }
+
+
+      // if location is not emptyc create location
 if(!empty($request->coordinates) && count($request->coordinates)>0){
     for($i=0;   $i < count($request->coordinates); $i++){
     $location=new Location();
@@ -182,6 +200,17 @@ if($request->other_b!=null){
      ]
 );
 
+}
+if($is_available==null){
+    DB::table('year_organization_district')->insert(
+    [
+     'organization_id' => $request->organization,
+     'district_id' =>$request->district,
+     'years_in_districts'=>$request->years_district,
+     'created_at'=>now(),
+     'updated_at'=>NULL,
+     ]
+);
 }
 DB::commit();
          return redirect()->route('admin.service.index')
@@ -205,14 +234,16 @@ DB::commit();
         $service=DB::table('services as s')
                 ->join('organizations as o','s.organization_id','=','o.id')
                 ->join('districts as d','s.district_id','=','d.id')
-                ->join('service_sectors as ss','s.service_sector_id','=','ss.id')
                 ->join('service_charges as sc','s.service_charge_id','=','sc.id')
-                ->join('service_scopes as scp','s.service_scope','=','scp.id')
-                ->join('beneficiaries as b','s.beneficiary_id','=','b.id')
-                ->join('district_traditionals as dt','s.areas','=','dt.id')
-                ->select('s.id as id','s.name as service_name','s.description','o.name as organization','d.name as district','ss.name as type','sc.name as charge','scp.name as scope','b.name as beneficiary','s.start_date','s.end_date','dt.name as areas','s.number_of_beneficiary','s.created_at','s.updated_at')
+
+                ->select('s.id as id','s.name as service_name','s.description','o.name as organization','d.name as district','sc.name as charge','s.start_date','s.end_date','s.areas as areas','s.number_of_beneficiary','s.created_at','s.updated_at')
                 ->where('s.id',$id)
                 ->first();
+$beneficiary=DB::table('beneficiaries')
+        ->leftjoin('service_beneficiaries','beneficiaries.id','=','service_beneficiaries.beneficiary_id')
+       ->where('service_beneficiaries.service_id',$id)
+       ->select('beneficiaries.id','beneficiaries.name')
+       ->get(); //dd($beneficiary);
 
 if($service==null){
     $service = Service::findOrFail($id);
@@ -223,6 +254,7 @@ $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->
         return Inertia::render('Admin/Service/Show', [
             'service' => $service,
             'coordinates'=>$coordinates,
+            'beneficiaries'=>$beneficiary,
         ]);
     }
 
@@ -235,14 +267,14 @@ $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->
            $organizations= Organization::select('id','name')->get();
             $organization= Organization::where('id',$service->organization_id)->select('id','name')->first();
         $this->authorize('adminUpdate', $service);
-$coordinates=Location::where('service_id',$id)->select('latitude','longitude')->get();
-$districts=DB::table('districts')->get();
-$selected=District::where('id',$service->district_id)->first();
-$tas=DB::table('district_traditionals')->where('district_id',$service->district_id)->get();
-$ta=DB::table('district_traditionals')->where('id',$service->areas)->first();
+        $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->get();
+        $districts=DB::table('districts')->get();
+        $selected=District::where('id',$service->district_id)->first();
+        $tas=DB::table('district_traditionals')->where('district_id',$service->district_id)->get();
+        $ta=DB::table('district_traditionals')->where('id',$service->areas)->first();
         //dd($typeOptions);
-   $types=DB::table('service_sectors')->get();
-   $selected_type=DB::table('service_sectors')->where('id',$service->service_sector_id)->select('id','name')->first();
+    $types=DB::table('service_sectors')->get();
+    $selected_type=DB::table('service_sectors')->where('id',$service->service_sector_id)->select('id','name')->first();
         $scope=DB::table('service_scopes')->get();
         $scope_selected=DB::table('service_scopes')->where('id',$service->service_scope)->select('id','name')->first();
         $beneficies=DB::table('beneficiaries')->get();
@@ -312,6 +344,18 @@ return redirect()->route('admin.service.index')
             ->with('message', __('Service updated successfully.'));
 
     }
+/**
+ * get beneficiary type for the service
+ */
+public function getBeneficiaryType($id){
+    $beneficiary=DB::table('beneficiaries')
+        ->leftjoin('service_beneficiaries','beneficiaries.id','=','service_beneficiaries.beneficiary_id')
+       ->where('service_beneficiaries.service_id',$id)
+       ->select('beneficiaries.id','beneficiaries.name')
+       ->get();
+    return response()->json($beneficiary);
+}
+
 
     /**
      * Remove the specified resource from storage.

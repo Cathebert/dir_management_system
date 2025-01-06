@@ -52,4 +52,5 @@ Route::group([
       Route::get('editDistrictTA/{id}','DistrictController@editDistrictTA')->name('district.ta.edit');
       Route::put('updateDistrictTA','DistrictController@updateDistrictTA')->name('district.ta.update');
       Route::get('getDistrictTA/{id?}','DistrictController@getDistrictTA')->name('tas');
+      Route::get('getBeneficiaryType/{id?}','ServiceController@getBeneficiaryType')->name('beneficiaryType');
 });

@@ -19,6 +19,9 @@ import BaseButtons from "@/Components/BaseButtons.vue"
 import NotificationBar from "@/Components/NotificationBar.vue"
 import Pagination from "@/Components/Admin/Pagination.vue"
 import Sort from "@/Components/Admin/Sort.vue"
+import { get } from "lodash"
+import axios from "axios"
+
 
 const props = defineProps({
     default_logo: null,
@@ -47,6 +50,29 @@ function destroy(id) {
         formDelete.delete(route("admin.service.destroy", id))
     }
 }
+const getBeneficiaryType = (id) => {
+    let route = window.routes.getBeneficiaryType;
+    axios.get(route + '/' + id).then((response) => {
+
+if(response.data.length>0){
+    console.log(response.data[0].name)
+    var html ="<ul>"
+
+    for(var i=0; i<response.data.length;i++){
+        html += "<li>"+response.data[i].name+",</li>"
+    }
+    html+="</ul>"
+    document.getElementById('ty' + id).innerHTML = html
+}
+else{
+    document.getElementById('ty'+ id).innerHTML="N/A"
+}
+        //return response.data
+    }).catch((error) => {
+        console.log(error)
+    })
+};
+
 </script>
 
 <template>
@@ -89,11 +115,12 @@ function destroy(id) {
                             <th>
                                 <Sort label="Name" attribute="s.name" />
                             </th>
+                            <th>Description</th>
                             <th>District</th>
+                            <th>Service Areas</th>
                             <th>Organization</th>
-                            <th>Service Type</th>
-                            <th>Service Scope</th>
                             <th>Beneficiary Type</th>
+                            <th>Service Charge</th>
                             <th>Beneficiary #</th>
                             <th>Started Date</th>
                             <th>End Date</th>
@@ -122,7 +149,9 @@ function destroy(id) {
                                 {{ organization.service_name }}
                                 </Link>
                             </td>
-
+                            <td>
+                                {{ organization.description }}
+                            </td>
                             <td>
 
                                 {{ organization.district }}
@@ -130,18 +159,30 @@ function destroy(id) {
                             </td>
                             <td>
 
+                                {{ organization.areas }}
+
+                            </td>
+                            <td>
+
+                                <Link :href="route('admin.organization.show', organization.organization_id)" class="
+                    no-underline
+                    hover:underline
+                    text-cyan-600
+                    dark:text-cyan-400
+                  ">
                                 {{ organization.organization_name }}
+                                </Link>
 
                             </td>
 
+
+
                             <td>
-                                {{ organization.service_type }}
+                                {{ getBeneficiaryType (organization.id) }}
+                                <div :id="`ty${organization.id}`"></div>
                             </td>
                             <td>
-                                {{ organization.service_scope }}
-                            </td>
-                            <td>
-                                {{ organization.beneficiary }}
+                                {{ organization.charge }}
                             </td>
                             <td>
                                 {{ organization.number_of_beneficiary }}

@@ -91,6 +91,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    beneficiaries: {
+        type: Object,
+        default: () => ({}),
+    },
 })
 
 const form = useForm({
@@ -173,44 +177,14 @@ console.log(props.service)
                   hidden
                   lg:block
                 ">
-                                Service Type
-                            </td>
-                            <td data-label="Service Type">
-                                {{ service.type }}
-                            </td>
-                        </tr>
-
-
-                        <tr>
-                            <td class="
-                  p-4
-                  pl-8
-                  text-slate-500
-                  dark:text-slate-400
-                  hidden
-                  lg:block
-                ">
-                                Service Scope
-                            </td>
-                            <td data-label="Service Scope">
-                                {{ service.scope }}
-                            </td>
-                        </tr>
-
-
-                        <tr>
-                            <td class="
-                  p-4
-                  pl-8
-                  text-slate-500
-                  dark:text-slate-400
-                  hidden
-                  lg:block
-                ">
                                 Beneficiary Type
                             </td>
-                            <td data-label="Name">
-                                {{ service.beneficiary }}
+                            <td data-label="Beneficiary Type">
+                                <ul>
+                                    <li v-for="value in beneficiaries" :key="value.id">
+                                        {{ value.name }}
+                                    </li>
+                                </ul>
                             </td>
                         </tr>
 

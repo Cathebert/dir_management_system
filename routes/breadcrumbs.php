@@ -103,3 +103,7 @@ Breadcrumbs::for('admin.tas', function (BreadcrumbTrail $trail,$id) {
     $trail->parent('admin.dashboard');
     $trail->push('Store Area', route('admin.tas',[$id]));
 });
+Breadcrumbs::for('admin.beneficiaryType', function (BreadcrumbTrail $trail,$id) {
+    $trail->parent('admin.dashboard');
+    $trail->push('BeneficiaryType', route('admin.beneficiaryType',[$id]));
+});

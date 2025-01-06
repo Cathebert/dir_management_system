@@ -153,6 +153,7 @@ const form = useForm({
     district:null,
     ta: null,
     specific_area:null,
+    years_district:null,
     organization:null,
     type:null,
     scope: null,
@@ -291,9 +292,20 @@ function showOther(value) {
                     </FormControl>
                 </FormField>
 
+                <!---year in district-->
+                <FormField label="Number of years operating in the district
+" :class="{ 'text-red-400': form.errors.years_district }">
+                    <FormControl v-model="form.years_district" min="1" type="number" label="Number of years operating in the district
+" :error="form.errors.years_district" placeholder="Number of years operating in the district
+">
+                        <div class="text-red-400 text-sm" v-if="form.errors.years_district">
+                            {{ form.errors.years_district }}
+                        </div>
+                    </FormControl>
+                </FormField>
 
-
-                <FormField label="Service Type" :class="{ 'text-red-400': form.errors.type }">
+                <!--moved to organization-->
+                <!-- FormField label="Service Type" :class="{ 'text-red-400': form.errors.type }">
 
                     <FormControl v-model="form.type" type="select" label="name" placeholder="--Select Service Type--"
                         :error="form.errors.type" :options="types">
@@ -301,7 +313,7 @@ function showOther(value) {
                             {{ form.errors.type }}
                         </div>
                     </FormControl>
-                </FormField>
+                </FormField --->
                 <!--multiple selection hidden-->
                 <!--div>
                     <FormField label="Service Type" :class="{ 'text-red-400': form.errors.start }">
@@ -332,14 +344,15 @@ function showOther(value) {
                         </div>
                     </FormControl>
                 </FormField>
-                <FormField label="Scope Of Service" :class="{ 'text-red-400': form.errors.scope }">
+                <!--removed scope-->
+                <!--FormField label="Scope Of Service" :class="{ 'text-red-400': form.errors.scope }">
                     <FormControl v-model="form.scope" type="select" name="label" placeholder="--Select Service Scope--"
                         :error="form.errors.scope" :options="scopes">
                         <div class="text-red-400 text-sm" v-if="form.errors.scope">
                             {{ form.errors.scope }}
                         </div>
                     </FormControl>
-                </FormField>
+                </FormField-->
 
                 <div>
                     <FormField label="Type Of Beneficiary" :class="{ 'text-red-400': form.errors.beneficiary }">

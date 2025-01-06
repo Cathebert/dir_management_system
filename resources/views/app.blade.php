@@ -19,6 +19,7 @@
         <script>
   window.routes = {
     'getTas' : '{{ route('admin.tas') }}',
+    'getBeneficiaryType' : '{{ route('admin.beneficiaryType') }}',
 
   }
 
