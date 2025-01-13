@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Organization;
+use App\Models\District;
 use BalajiDharma\LaravelAdminCore\Actions\User\UserCreateAction;
 use BalajiDharma\LaravelAdminCore\Actions\User\UserUpdateAction;
 use BalajiDharma\LaravelAdminCore\Data\User\UserCreateData;
@@ -25,6 +27,7 @@ class UserController extends Controller
     public function index()
     {
         $this->authorize('adminViewAny', User::class);
+         if(auth()->user()->organisation_id==0 && auth()->user()->organization_id==0){
         $users = (new User)->newQuery();
 
         if (request()->has('search')) {
@@ -46,7 +49,57 @@ class UserController extends Controller
         $users = $users->paginate(config('admin.paginate.per_page'))
                     ->onEachSide(config('admin.paginate.each_side'))
                     ->appends(request()->query());
+    }
 
+    //district level
+
+    if(auth()->user()->organization_id===NULL){
+        $users = (new User)->newQuery();
+
+        if (request()->has('search')) {
+            $users->where('name', 'Like', '%'.request()->input('search').'%');
+        }
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $users->orderBy($attribute, $sort_order);
+        } else {
+            $users->latest();
+        }
+
+        $users = $users->where('district_id',auth()->user()->district_id)->paginate(config('admin.paginate.per_page'))
+                    ->onEachSide(config('admin.paginate.each_side'))
+                    ->appends(request()->query());
+    }
+
+      if(auth()->user()->organization_id!=NULL){
+        $users = (new User)->newQuery();
+
+        if (request()->has('search')) {
+            $users->where('name', 'Like', '%'.request()->input('search').'%');
+        }
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $users->orderBy($attribute, $sort_order);
+        } else {
+            $users->latest();
+        }
+
+        $users = $users->where([['district_id','=',auth()->user()->district_id],['organization_id','=',auth()->user()->organization_id]])->paginate(config('admin.paginate.per_page'))
+                    ->onEachSide(config('admin.paginate.each_side'))
+                    ->appends(request()->query());
+    }
         return Inertia::render('Admin/User/Index', [
             'users' => $users,
             'filters' => request()->all('search'),
@@ -67,9 +120,12 @@ class UserController extends Controller
     {
         $this->authorize('adminCreate', User::class);
         $roles = Role::all()->pluck('name', 'name');
-
+$districts=District::get();
+$organizations=Organization::get();
         return Inertia::render('Admin/User/Create', [
             'roles' => $roles,
+            'organizations'=>$organizations,
+            'districts'=>$districts,
         ]);
     }
 
@@ -80,7 +136,9 @@ class UserController extends Controller
      */
     public function store(UserCreateData $data, UserCreateAction $userCreateAction)
     {
+
         $this->authorize('adminCreate', User::class);
+
         $userCreateAction->handle($data);
 
         return redirect()->route('admin.user.index')

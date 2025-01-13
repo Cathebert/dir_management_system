@@ -9,6 +9,7 @@ use BalajiDharma\LaravelAdminCore\Data\Media\MediaData;
 use Plank\Mediable\Media;
 use Illuminate\Support\Facades\Auth;
 use App\Models\District;
+use App\Models\Organization;
 use App\Models\DistrictTraditional;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class DistrictController extends Controller
     public function index()
     {
        $this->authorize('adminViewAny', District::class);
+ if(auth()->user()->organisation_id==0 && auth()->user()->organization_id==0){
         $mediaItems = (new District)->newQuery();
 
         if (request()->has('search')) {
@@ -39,17 +41,69 @@ class DistrictController extends Controller
             $mediaItems->latest();
         }
 
-        $mediaItems = $mediaItems->paginate(config('admin.paginate.per_page'))
+        $mediaItems = $mediaItems->where('id','<>',0)->paginate(config('admin.paginate.per_page'))
             ->onEachSide(config('admin.paginate.each_side'));
+    }
+    if(auth()->user()->organization_id!=NULL){
+$mediaItems = (new District)->newQuery();
+
+        if (request()->has('search')) {
+            $mediaItems->where('name', 'Like', '%'.request()->input('search').'%');
+        }
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $mediaItems->orderBy($attribute, $sort_order);
+        } else {
+            $mediaItems->latest();
+        }
+
+        $mediaItems = $mediaItems->where('id','<>',0)->where('id',auth()->user()->district_id)->paginate(config('admin.paginate.per_page'))
+            ->onEachSide(config('admin.paginate.each_side'));
+    }
 
 
+     if(auth()->user()->organization_id===NULL){
+$mediaItems = (new District)->newQuery();
+
+        if (request()->has('search')) {
+            $mediaItems->where('name', 'Like', '%'.request()->input('search').'%');
+        }
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $mediaItems->orderBy($attribute, $sort_order);
+        } else {
+            $mediaItems->latest();
+        }
+
+        $mediaItems = $mediaItems->where('id','<>',0)->where('id',auth()->user()->district_id)->paginate(config('admin.paginate.per_page'))
+            ->onEachSide(config('admin.paginate.each_side'));
+    }
+
+    if(auth()->user()->district_id===0 && auth()->user()->organization_id==0 ){
+        $add=true;
+    }
+    else{
+        $add=false;
+    }
         return Inertia::render('Admin/District/Index', [
             'items' =>collect($mediaItems),
             'filters' => request()->all('search'),
             'can' => [
-                'create' => Auth::user()->can('media create'),
+                'create' => $add,
                 'edit' => Auth::user()->can('media edit'),
-                'delete' => Auth::user()->can('media delete'),
+                'delete' => $add,
             ],
         ]);
 
@@ -210,5 +264,10 @@ DistrictTraditional::where('id',$request->id)->update([
 public function getDistrictTA(Request $request, $id){
     $tas=DistrictTraditional::where('district_id',$id)->select('id','name')->get();
     return response()->json(['states'=>$tas]);
+}
+
+public function getDistrictOrganization(Request $request, $id){
+    $tas=Organization::where('district_id',$id)->select('id','name')->get();
+    return response()->json(['organization'=>$tas]);
 }
 }

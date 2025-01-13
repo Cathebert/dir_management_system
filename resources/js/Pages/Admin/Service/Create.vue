@@ -29,68 +29,68 @@ let greenIcon=null
 
 
 onMounted(() => {
-   map= L.map('map').setView(center, 6);
-    L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+//   /*  map= L.map('map').setView(center, 6);
+//     L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
 
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-    }).addTo(map);
+//         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+//     }).addTo(map);
 
-    map.on('click',function(e){
-        if (marker) {
-            marker.setLatLng(e.latlng);
+//     map.on('click',function(e){
+//         if (marker) {
+//             marker.setLatLng(e.latlng);
 
-        } else {
-             greenIcon = L.icon({
-                 iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-red.png',
-                 shadowUrl:'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
+//         } else {
+//              greenIcon = L.icon({
+//                  iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-red.png',
+//                  shadowUrl:'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
 
-                iconSize: [38, 95], // size of the icon
-                shadowSize: [50, 64], // size of the shadow
-                iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
-                shadowAnchor: [4, 62],  // the same for the shadow
-                popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
-            });
-            /*circle = L.circle([e.latlng.lat, e.latlng.lng], {
-                color: 'green',
-                fillColor: '#f03',
-                fillOpacity: 0.5,
-                radius: 5000
-            }).addTo(map);*/
-            marker = L.marker(e.latlng, { icon: greenIcon }).addTo(map);
-        }
-        console.log(e.latlng.lat)
+//                 iconSize: [38, 95], // size of the icon
+//                 shadowSize: [50, 64], // size of the shadow
+//                 iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+//                 shadowAnchor: [4, 62],  // the same for the shadow
+//                 popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+//             });
+//             /*circle = L.circle([e.latlng.lat, e.latlng.lng], {
+//                 color: 'green',
+//                 fillColor: '#f03',
+//                 fillOpacity: 0.5,
+//                 radius: 5000
+//             }).addTo(map);*/
+//             marker = L.marker(e.latlng, { icon: greenIcon }).addTo(map);
+//         }
+//         console.log(e.latlng.lat)
 
-        form.latitude = e.latlng.lat
-        form.longitude=e.latlng.lng
-       // document.getElementById('latitude').value = e.latlng.lat;
-       // document.getElementById('longitude').value = e.latlng.lng;
-    })
-    map.addEventListener("keypress", function (event) {
-        console.log(event.originalEvent.key)
-        // If the user presses the "Enter" key on the keyboard
-        if (event.originalEvent.key === "s" || event.originalEvent.key === "S") {
-            var location = { lat: form.latitude, lng:form.longitude}
-            form.coordinates.push(location)
-
-
-
-            // Here's where you iterate over the array of coordinate objects.
-            form.coordinates.forEach(function (coord) {
-                 circle = L.circle(coord, {
-                    color: 'red',
-                    fillColor: '#f03',
-                    fillOpacity: 0.5,
-                    radius: 5000
-                }).addTo(map);
-            });
-
-            // Set the view to where some of the circles are drawn.
-
-            alert('location saved')
+//         form.latitude = e.latlng.lat
+//         form.longitude=e.latlng.lng
+//        // document.getElementById('latitude').value = e.latlng.lat;
+//        // document.getElementById('longitude').value = e.latlng.lng;
+//     })
+//     map.addEventListener("keypress", function (event) {
+//         console.log(event.originalEvent.key)
+//         // If the user presses the "Enter" key on the keyboard
+//         if (event.originalEvent.key === "s" || event.originalEvent.key === "S") {
+//             var location = { lat: form.latitude, lng:form.longitude}
+//             form.coordinates.push(location)
 
 
-        }
-    });
+
+//             // Here's where you iterate over the array of coordinate objects.
+//             form.coordinates.forEach(function (coord) {
+//                  circle = L.circle(coord, {
+//                     color: 'red',
+//                     fillColor: '#f03',
+//                     fillOpacity: 0.5,
+//                     radius: 5000
+//                 }).addTo(map);
+//             });
+
+//             // Set the view to where some of the circles are drawn.
+
+//             alert('location saved')
+
+
+//         }
+//     }); */
 
 //L.marker([e.latlng.lat, e.latlng.lng],).addTo(map);
 });
@@ -434,7 +434,7 @@ function showOther(value) {
                     </FormControl>
                 </FormField>-->
 
-                <FormField label="press S when desired location is pinned" style="color: brown;"
+               <!--  <FormField label="press S when desired location is pinned" style="color: brown;"
                     :class="{ 'text-red-400': form.errors.unique }">
                     <FormControl v-model="form.latitude" type="hidden" :error="form.errors.latitude" id="latitude">
                         <div class="text-red-400 text-sm" v-if="form.errors.latitude">
@@ -445,9 +445,9 @@ function showOther(value) {
                 <CardBox>
 
 
-                    <div id="map" style="height: 500px; margin-top:5px;">
+                    <div id="map" style="height: 500px; margin-top:5px;" hidden>
                     </div>
-                </CardBox>
+                </CardBox> -->
 
                 <template #footer>
                     <BaseButtons>

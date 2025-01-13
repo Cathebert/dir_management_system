@@ -128,8 +128,8 @@ function destroy(id) {
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <a :href="organization.url" class="
+                            <td v-if="organization.url">
+                                <a :href="organization.url"  target="_blank" class="
                     no-underline
                     hover:underline
                     text-cyan-600
@@ -138,7 +138,9 @@ function destroy(id) {
                                     {{ organization.name }}
                                 </a>
                             </td>
+<td v-else>
 
+</td>
                             <td>
                                 {{ organization.description }}
                             </td>

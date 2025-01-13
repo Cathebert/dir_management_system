@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
+use App\Models\District;
 use App\Models\OrganizationType;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,7 @@ class OrganizationController extends Controller
 
 
          $this->authorize('adminViewAny', Organization::class);
+           if(auth()->user()->organisation_id==0 && auth()->user()->organization_id==0){
         $organizations = (new Organization)->newQuery();
 
         if (request()->has('search')) {
@@ -39,10 +41,62 @@ class OrganizationController extends Controller
             $organizations->latest();
         }
 
-       $organizations =  $organizations->paginate(config('admin.paginate.per_page'))
+       $organizations =  $organizations->where('id','<>',0)->paginate(config('admin.paginate.per_page'))
+            ->onEachSide(config('admin.paginate.each_side'));
+    }
+//district
+    if(auth()->user()->organization_id===NULL){
+   $organizations = (new Organization)->newQuery();
+
+        if (request()->has('search')) {
+            $organizations->where('name', 'Like', '%'.request()->input('search').'%');
+        }
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $organizations->orderBy($attribute, $sort_order);
+        } else {
+            $organizations->latest();
+        }
+
+       $organizations =  $organizations->where('id','<>',0)->where('district_id',auth()->user()->district_id)->paginate(config('admin.paginate.per_page'))
             ->onEachSide(config('admin.paginate.each_side'));
 
 
+    }
+
+
+    //org level
+
+    if(auth()->user()->organization_id!=NULL){
+   $organizations = (new Organization)->newQuery();
+
+        if (request()->has('search')) {
+            $organizations->where('name', 'Like', '%'.request()->input('search').'%');
+        }
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $organizations->orderBy($attribute, $sort_order);
+        } else {
+            $organizations->latest();
+        }
+
+       $organizations =  $organizations->where('id','<>',0)->where([['district_id','=',auth()->user()->district_id],['id',auth()->user()->organization_id]])->paginate(config('admin.paginate.per_page'))
+            ->onEachSide(config('admin.paginate.each_side'));
+
+
+    }
         return Inertia::render('Admin/Organisation/Index', [
             'items' =>collect( $organizations),
             'default_logo'=>asset('logo/logo.png'),
@@ -62,11 +116,30 @@ class OrganizationController extends Controller
     {
         //
         $this->authorize('adminCreate', Media::class);
+        //NATIONAL LEVEL
+ if(auth()->user()->district_id===0 && auth()->user()->organization_id===0){
+$names=District::select('id','name')->where('id','<>',0)->get();
+ }
+//DISTRICT LEVEL
+  if(auth()->user()->organization_id===NULL){
+$names=District::select('id','name')
+->where('id','<>',0)
+->where('id',auth()->user()->district_id)
+->get();
+ }
+//ORGANISATION LEVEL
+   if(auth()->user()->organization_id!=NULL){
+$names=District::select('id','name')
+->where('id','<>',0)
+->where('id',auth()->user()->district_id)
+->get();
+ }
         $org_type= OrganizationType::get();
         $org_sector=DB::table('service_sectors')->select('id','name')->get();
         return Inertia::render('Admin/Organisation/Create', [
             'typeOptions' => $org_type,
             'sectors' => $org_sector,
+            'districts'=>$names
         ]);
     }
 
@@ -79,6 +152,7 @@ class OrganizationController extends Controller
          $request->validate([
         'name' => 'required',
         'sector' => 'required',
+        'district_id'=>'required',
 
 
     ]);
@@ -93,7 +167,9 @@ $request->file->move(public_path()."/logo/", $filename);
 $organization=new Organization();
 $organization->organization_type_id=$request->type;
 $organization->name=$request->name;
+
 $organization->description=$request->description;
+$organization->district=$request->district_id;
 $organization->phone=$request->phone;
 $organization->address=$request->address;
 $organization->url=$request->url;
@@ -169,7 +245,7 @@ $selected=OrganizationType::where('id',$organization->organization_type_id)->fir
      */
     public function update(Request $request,$id)
     {
-dd($request->all());
+
 
         $name=$request->name;
         $description=$request->description;

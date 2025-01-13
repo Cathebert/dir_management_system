@@ -80,7 +80,8 @@ else{
 
         <Head title="Service" />
         <SectionMain>
-            <SectionTitleLineWithButton :icon="mdiServer" title="Services" main>
+            <SectionTitleLineWithButton :icon="mdiServer" :title="' Services #' + items.data.length"
+                main>
                 <BaseButton v-if="can.delete" :route-name="route('admin.service.create')" :icon="mdiPlus" label="Add"
                     color="info" rounded-full small />
             </SectionTitleLineWithButton>
@@ -88,7 +89,7 @@ else{
                 :icon="mdiAlertBoxOutline">
                 {{ $page.props.flash.message }}
             </NotificationBar>
-            <CardBox class="mb-6" has-table>
+            <CardBox class="mb-12" has-table>
                 <form @submit.prevent="form.get(route('admin.service.index'))">
                     <div class="py-2 flex">
                         <div class="flex pl-4">
@@ -107,17 +108,17 @@ else{
                     </div>
                 </form>
             </CardBox>
-            <CardBox class="mb-6" has-table>
-                <table>
+            <CardBox class="mb-12" has-table style="overflow-x: auto;">
+                <table style="width:100%">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>
                                 <Sort label="Name" attribute="s.name" />
                             </th>
-                            <th>Description</th>
+
                             <th>District</th>
-                            <th>Service Areas</th>
+                            <th style="max-width:120px">Service Areas</th>
                             <th>Organization</th>
                             <th>Beneficiary Type</th>
                             <th>Service Charge</th>
@@ -125,8 +126,6 @@ else{
                             <th>Started Date</th>
                             <th>End Date</th>
                             <th>Map</th>
-
-
                             <th v-if="can.edit || can.delete">Actions</th>
                         </tr>
                     </thead>
@@ -149,17 +148,15 @@ else{
                                 {{ organization.service_name }}
                                 </Link>
                             </td>
-                            <td>
-                                {{ organization.description }}
-                            </td>
+
                             <td>
 
                                 {{ organization.district }}
 
                             </td>
                             <td>
-
                                 {{ organization.areas }}
+
 
                             </td>
                             <td>

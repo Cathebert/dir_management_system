@@ -15,10 +15,26 @@ class DashboardController extends Controller
     public function index(){
 
 
-
+  if(auth()->user()->organisation_id==0 && auth()->user()->organization_id==0){
 $service_count=Service::count();
 $users=User::count();
+    }
+     if(auth()->user()->organization_id===NULL){
+$service_count=Service::where('district_id',auth()->user()->district_id)->count();
+$users=User::where('district_id',auth()->user()->district_id)->count();
+    }
+
+      if(auth()->user()->organization_id!=NULL){
+$service_count=Service::where('district_id',auth()->user()->district_id)
+->where('organization_id',auth()->user()->organization_id)
+->count();
+$users=User::where('district_id',auth()->user()->district_id)
+->where('organization_id',auth()->user()->organization_id)
+->count();
+    }
+
    // $this->authorize('adminViewAny', Organization::class);
+    if(auth()->user()->organisation_id==0 && auth()->user()->organization_id==0){
     $organizations = (new  Organization)->newQuery();
 
         if (request()->query('sort')) {
@@ -35,7 +51,47 @@ $users=User::count();
 
        $organizations =  $organizations->paginate(config('admin.paginate.per_page'))
             ->onEachSide(config('admin.paginate.each_side'));
+    }
+    if(auth()->user()->organization_id===NULL){
 
+$organizations = (new  Organization)->newQuery();
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $organizations->orderBy($attribute, $sort_order);
+        } else {
+            $organizations->latest();
+        }
+
+       $organizations =  $organizations->where('district_id',auth()->user()->district_id)->paginate(config('admin.paginate.per_page'))
+            ->onEachSide(config('admin.paginate.each_side'));
+    }
+
+    if(auth()->user()->organization_id!=NULL){
+$organizations = (new  Organization)->newQuery();
+
+        if (request()->query('sort')) {
+            $attribute = request()->query('sort');
+            $sort_order = 'ASC';
+            if (strncmp($attribute, '-', 1) === 0) {
+                $sort_order = 'DESC';
+                $attribute = substr($attribute, 1);
+            }
+            $organizations->orderBy($attribute, $sort_order);
+        } else {
+            $organizations->latest();
+        }
+
+       $organizations =  $organizations->where('district_id',auth()->user()->district_id)->paginate(config('admin.paginate.per_page'))
+            ->onEachSide(config('admin.paginate.each_side'));
+
+
+    }
         return Inertia::render('Admin/Dashboard', [
             'items' =>collect( $organizations),
             'organization_count'=>count($organizations),

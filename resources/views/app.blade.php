@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'DMS') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -20,6 +20,7 @@
   window.routes = {
     'getTas' : '{{ route('admin.tas') }}',
     'getBeneficiaryType' : '{{ route('admin.beneficiaryType') }}',
+    'getDistrictOrganization':'{{ route('admin.getDistrictOrganization') }}'
 
   }
 

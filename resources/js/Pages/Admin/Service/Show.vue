@@ -95,6 +95,20 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    organization_sector: {
+        type: Object,
+        default: () => ({}),
+    },
+    organization_type: {
+        type: Object,
+        default: () => ({}),
+    },
+
+    other_beneficiary: {
+        type: Object,
+        default: () => ({}),
+    },
+
 })
 
 const form = useForm({
@@ -136,6 +150,21 @@ console.log(props.service)
                             </td>
                         </tr>
 
+                        <tr>
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                Service Description
+                            </td>
+                            <td data-label="Service Description">
+                                {{ service.service_description }}
+                            </td>
+                        </tr>
 
                         <tr>
                             <td class="
@@ -152,6 +181,47 @@ console.log(props.service)
                                 {{ service.organization }}
                             </td>
                         </tr>
+
+
+                        <tr>
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                Organization Type
+                            </td>
+                            <td data-label="Type">
+                                {{ organization_type.name }}
+                            </td>
+                        </tr>
+
+
+
+                        <tr>
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                Organization Sector
+                            </td>
+                            <td data-label="Sector">
+                                <ul>
+                                    <li v-for="value in organization_sector" :key="value.id">
+                                        {{ value.name }}
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+
+
                         <tr>
                             <td class="
                   p-4
@@ -189,6 +259,21 @@ console.log(props.service)
                         </tr>
 
 
+                        <tr v-if="other_beneficiary">
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                Other Beneficiary
+                            </td>
+                            <td data-label="Other">
+                                {{ other_beneficiary.name }}
+                            </td>
+                        </tr>
                         <tr>
                             <td class="
                   p-4
@@ -239,8 +324,8 @@ console.log(props.service)
                     </tbody>
                 </table>
             </CardBox>
-            <CardBox>
-                <div id="map" style="height: 500px; margin-top:5px;">
+            <CardBox hidden>
+                <div id="map" style="height: 500px; margin-top:5px;" hidden>
                 </div>
             </CardBox>
         </SectionMain>

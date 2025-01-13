@@ -14,6 +14,7 @@ import FormField from '@/Components/FormField.vue'
 import FormControl from '@/Components/FormControl.vue'
 import BaseButton from '@/Components/BaseButton.vue'
 import BaseButtons from '@/Components/BaseButtons.vue'
+import VueMultiselect from 'vue-multiselect'
 import "leaflet/dist/leaflet.css"
 import L from 'leaflet';
 
@@ -195,12 +196,11 @@ const form = useForm({
     district: props.districts.id ?? props.district.id,
     organization:props.organizations.id ?? props.organization.id,
     ta: props.tas.id??props.service.ta,
-    type: props.types.id??props.selected_type.id,
-    scope: props.scopes.id??props.scope_selected.id,
-    beneficiary: props.beneficiaries.id ?? props.beneficiary_selected.id,
+    specific_area: props.service.areas,
+    beneficiary: props.beneficiary_selected ?? props.beneficiaries,
     start: props.service.start_date,
     end: props.service.end_date,
-    charge: props.charges.id??props.charge_selected.charge,
+    charge: props.charges.id??props.charge_selected.id,
     number: props.service.number_of_beneficiary,
     unique: null,
     location: null,
@@ -307,12 +307,11 @@ function getTAs(id) {
                 </FormField>
 
 
-                <FormField label="Service Type" :class="{ 'text-red-400': form.errors.type }">
-
-                    <FormControl v-model="form.type" type="select" label="name" placeholder="--Select Service Type--"
-                        :error="form.errors.type" :options="types">
-                        <div class="text-red-400 text-sm" v-if="form.errors.type">
-                            {{ form.errors.type }}
+                <FormField label="Specific Area within district" :class="{ 'text-red-400': form.errors.district }">
+                    <FormControl v-model="form.specific_area" type="textarea" label="Specific Area"
+                        :error="form.errors.specific_area" placeholder="Enter Specific Areas within the district">
+                        <div class="text-red-400 text-sm" v-if="form.errors.specific_area">
+                            {{ form.errors.district }}
                         </div>
                     </FormControl>
                 </FormField>
@@ -340,24 +339,22 @@ function getTAs(id) {
                         </div>
                     </FormControl>
                 </FormField>
-                <FormField label="Scope Of Service" :class="{ 'text-red-400': form.errors.scope }">
-                    <FormControl v-model="form.scope" type="select" name="label" placeholder="--Select Service Scope--"
-                        :error="form.errors.scope" :options="scopes">
-                        <div class="text-red-400 text-sm" v-if="form.errors.scope">
-                            {{ form.errors.scope }}
-                        </div>
-                    </FormControl>
-                </FormField>
 
 
-                <FormField label="Type Of Beneficiary" :class="{ 'text-red-400': form.errors.beneficiary }">
-                    <FormControl v-model="form.beneficiary" type="select" label="Type Of Beneficiary"
-                        placeholder="--Select Beneficiary--" :error="form.errors.beneficiary" :options="beneficiaries">
-                        <div class="text-red-400 text-sm" v-if="form.errors.beneficiary">
-                            {{ form.errors.beneficiary }}
-                        </div>
-                    </FormControl>
-                </FormField>
+
+                <div>
+                    <FormField label="Organization Sector" :class="{ 'text-red-400': form.errors.beneficiary }">
+                        <VueMultiselect v-model="form.beneficiary" :options="beneficiaries" :multiple="true"
+                            :close-on-select="true" placeholder="--Select Organization sectors--" label="name"
+                            track-by="name" :style="{ 'background-color': activeColor }" />
+                    </FormField>
+                    <div class="text-red-400 text-sm" v-if="form.errors.beneficiary">
+                        {{ form.errors.beneficiary }}
+
+                    </div>
+
+                </div>
+                &nbsp;&nbsp;
                 <div v-show="form.beneficiary === 6">
                     <FormField label="Other Type Beneficiary" :class="{ 'text-red-400': form.errors.name }">
                         <FormControl v-model="form.other_b" type="text" placeholder="Other" :error="form.errors.name">
@@ -377,8 +374,8 @@ function getTAs(id) {
 
 
                 <FormField label="Service Charge" :class="{ 'text-red-400': form.errors.charge }">
-                    <FormControl v-model="form.charge" type="select" label="Service Charge" placeholder="--Select Service Charge"
-                        :error="form.errors.charge" :options="charges">
+                    <FormControl v-model="form.charge" type="select" label="Service Charge"
+                        placeholder="--Select Service Charge" :error="form.errors.charge" :options="charges">
                         <div class="text-red-400 text-sm" v-if="form.errors.charge">
                             {{ form.errors.number }}
                         </div>
@@ -386,7 +383,7 @@ function getTAs(id) {
                 </FormField>
 
                 <FormField label="press S when desired location is pinned" style="color: brown;"
-                    :class="{ 'text-red-400': form.errors.unique }">
+                    :class="{ 'text-red-400': form.errors.unique }" hidden>
                     <FormControl v-model="form.latitude" type="hidden" :error="form.errors.latitude" id="latitude">
                         <div class="text-red-400 text-sm" v-if="form.errors.latitude">
                             {{ form.errors.latitude }}
@@ -396,7 +393,7 @@ function getTAs(id) {
                 <CardBox>
 
 
-                    <div id="map" style="height: 500px; margin-top:5px;">
+                    <div id="map" style="height: 500px; margin-top:5px;" hidden>
                     </div>
                 </CardBox>
 

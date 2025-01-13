@@ -25,12 +25,17 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    districts: {
+        type: Object,
+        default: () => ({}),
+    },
 })
 
 const form = useForm({
 
     name:null,
     type:null,
+    district: null,
     description:null,
     sector:[],
     email:null,
@@ -68,6 +73,16 @@ const form = useForm({
                         </div>
                     </FormControl>
                 </FormField>
+
+                <FormField label="Location" :class="{ 'text-red-400': form.errors.district }">
+
+                    <FormControl v-model="form.district" type="select" label="name" placeholder="--Select District--"
+                        :error="form.errors.district" :options="districts" @update:modelValue="getTAs($event)">
+                        <div class="text-red-400 text-sm" v-if="form.errors.district">
+                            {{ form.errors.district }}
+                        </div>
+                    </FormControl>
+                </FormField>
                 <FormField label="Mission/Vision" :class="{ 'text-red-400': form.errors.description }">
                     <FormControl v-model="form.description" type="textarea" placeholder="Enter Mission /Vision"
                         :error="form.errors.description">
@@ -100,7 +115,7 @@ const form = useForm({
                 </FormField>
 
                 <FormField label="Address" :class="{ 'text-red-400': form.errors.address }">
-                    <FormControl v-model="form.address" type="text" placeholder="Enter Email"
+                    <FormControl v-model="form.address" type="text" placeholder="Enter Address"
                         :error="form.errors.address">
                         <div class="text-red-400 text-sm" v-if="form.errors.address">
                             {{ form.errors.address }}
@@ -109,7 +124,7 @@ const form = useForm({
                 </FormField>
 
                 <FormField label="Phone" :class="{ 'text-red-400': form.errors.phone }">
-                    <FormControl v-model="form.phone" type="text" placeholder="Enter Email" :error="form.errors.phone">
+                    <FormControl v-model="form.phone" type="text" placeholder="Enter phone" :error="form.errors.phone">
                         <div class="text-red-400 text-sm" v-if="form.errors.phone">
                             {{ form.errors.phone }}
                         </div>

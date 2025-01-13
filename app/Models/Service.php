@@ -8,8 +8,8 @@ class Service extends Model
 {
     //mass assaignment
 
-      protected $fillable = ['organization_id','district_id','name', 'description','service_type', 'service_scope', 'type_of_beneficiary', 'number_of_beneficiary',
-                            'unique_services', 'number_service_location', 'challenges_faced'
+      protected $fillable = ['organization_id','district_id','areas','name', 'description','number_of_beneficiary',
+                            'start_date', 'end_date',
                           ];
 
     public function organization(): BelongsTo
