@@ -248,7 +248,7 @@ $names=District::select('id','name')
      */
     public function store(Request $request)
     {
-dd($request->ta);
+
         //$this->authorize('adminCreate', Service::class);
          $request->validate([
          'name' => 'required',

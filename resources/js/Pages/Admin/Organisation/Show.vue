@@ -169,7 +169,7 @@ const props = defineProps({
 
             <CardBox>
                 <SectionTitleLineWithButton main :title="organization.name + ' Services #'+services.length">
-                    <BaseButton :route-name="route('admin.organization.index')" :icon="mdiPlus"
+                    <BaseButton :route-name="route('admin.organization.addService',organization.id)" :icon="mdiPlus"
                         label="Add" color="info" rounded-full small />
 
                 </SectionTitleLineWithButton>

@@ -111,4 +111,9 @@ Breadcrumbs::for('admin.beneficiaryType', function (BreadcrumbTrail $trail,$id) 
 Breadcrumbs::for('admin.getDistrictOrganization', function (BreadcrumbTrail $trail,$id) {
     $trail->parent('admin.dashboard');
     $trail->push('BeneficiaryType', route('admin.getDistrictOrganization',[$id]));
+
+});
+Breadcrumbs::for('admin.organization.addService', function (BreadcrumbTrail $trail,$id) {
+    $trail->parent('admin.dashboard');
+    $trail->push('Service', route('admin.organization.addService',[$id]));
 });

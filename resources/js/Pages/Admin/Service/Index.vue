@@ -80,8 +80,8 @@ else{
 
         <Head title="Complementary Social Services" />
         <SectionMain>
-            <SectionTitleLineWithButton :icon="mdiServer" :title="' Complementary Social Services #' + items.data.length"
-                main>
+            <SectionTitleLineWithButton :icon="mdiServer"
+                :title="' Complementary Social Services #' + items.data.length" main>
                 <BaseButton v-if="can.delete" :route-name="route('admin.service.create')" :icon="mdiPlus" label="Add"
                     color="info" rounded-full small />
             </SectionTitleLineWithButton>
@@ -149,17 +149,17 @@ else{
                                 </Link>
                             </td>
 
-                            <td>
+                            <td data-label="District">
 
                                 {{ organization.district }}
 
                             </td>
-                            <td>
+                            <td data-label="Areas" style="max-width:200px; word-wrap: break-word;">
                                 {{ organization.areas }}
 
 
                             </td>
-                            <td>
+                            <td data-label="Organization">
 
                                 <Link :href="route('admin.organization.show', organization.organization_id)" class="
                     no-underline
@@ -174,23 +174,23 @@ else{
 
 
 
-                            <td>
+                            <td data-label="Beneficiary">
                                 {{ getBeneficiaryType (organization.id) }}
                                 <div :id="`ty${organization.id}`"></div>
                             </td>
-                            <td>
+                            <td data-label="Service Charge">
                                 {{ organization.charge }}
                             </td>
-                            <td>
+                            <td data-label="# Beneficiary">
                                 {{ organization.number_of_beneficiary }}
                             </td>
-                            <td>
+                            <td data-label="Start Date">
                                 {{ organization.start_date ?? 'N/A' }}
                             </td>
-                            <td>
+                            <td data-label="End Date">
                                 {{ organization.end_date??'N/A' }}
                             </td>
-                            <td data-label="URL">
+                            <td data-label="View">
                                 <div class="w-12 rounded">
                                     <div>
 

@@ -103,7 +103,7 @@ function destroy(id) {
                     <tbody>
 
                         <tr v-for=" organization in items.data" :key="organization.id">
-                            <td data-label="File">
+                            <td data-label="#">
                                 {{ organization.id }}
                             </td>
                             <td data-label="Name">
@@ -129,8 +129,8 @@ function destroy(id) {
                                     </div>
                                 </div>
                             </td>
-                            <td v-if="organization.url">
-                                <a :href="organization.url"  target="_blank" class="
+                            <td v-if="organization.url" data-label="Website">
+                                <a :href="organization.url" target="_blank" class="
                     no-underline
                     hover:underline
                     text-cyan-600
@@ -139,19 +139,19 @@ function destroy(id) {
                                     {{ organization.name }}
                                 </a>
                             </td>
-<td v-else>
+                            <td v-else>
 
-</td>
-                            <td>
+                            </td>
+                            <td data-label="Description">
                                 {{ organization.description }}
                             </td>
-                            <td>
+                            <td data-label="Address">
                                 {{ organization.address }}
                             </td>
-                            <td>
+                            <td data-label="Phone">
                                 {{ organization.phone }}
                             </td>
-                            <td>
+                            <td data-label="Email">
                                 {{ organization.email }}
                             </td>
                             <td data-label="created_at">

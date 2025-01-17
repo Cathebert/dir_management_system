@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use App\Models\District;
 use App\Models\OrganizationType;
+use App\Models\Service;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -314,5 +315,175 @@ DB::table('organization_service_sector')->insert([
 
         return redirect()->route('admin.organization.index')
             ->with('message', __('Organization deleted successfully.'));
+    }
+
+
+    public function addService($id){
+       $this->authorize('adminCreate', Service::class);
+       $organization=Organization::find($id);
+       //national level user
+ if(auth()->user()->district_id===0 && auth()->user()->organization_id===0){
+      $organizations = Organization::select('id','name','district_id')->where('id',$id)->get();
+      //dd($organizations);
+ }
+ //district level user
+ if(auth()->user()->organization_id===NULL){
+     $organizations = Organization::select('id','name','district_id')
+    ->where('id',$id)
+     ->get();
+ }
+
+ //location level user
+  if(auth()->user()->organization_id!=NULL){
+     $organizations = Organization::select('id','name','district_id')
+     ->where('id','<>',0)
+    ->where('id',$id)
+
+     ->get();
+ }
+
+//NATIONAL LEVEL
+ if(auth()->user()->district_id===0 && auth()->user()->organization_id===0){
+$names=District::select('id','name')->where('id', $organization->district_id)->get();
+ }
+//DISTRICT LEVEL
+  if(auth()->user()->organization_id===NULL){
+$names=District::select('id','name')
+->where('id', $organization->district_id)
+->get();
+ }
+//ORGANISATION LEVEL
+   if(auth()->user()->organization_id!=NULL){
+$names=District::select('id','name')
+->where('id', $organization->district_id)
+->get();
+ }
+
+        //dd($typeOptions);
+        $types=DB::table('service_sectors')->get();
+        $scope=DB::table('service_scopes')->get();
+        $beneficies=DB::table('beneficiaries')->select('id','name')->get();
+        $charges=DB::table('service_charges')->get();
+        $number=array('<100','100-500','501-1000','>1000');
+        $locations=array('1','2-3','4-5','More than 5');
+        return Inertia::render('Admin/Organisation/AddService', [
+            'organizations' =>$organizations,
+            'districts'=>$names,
+            'types'=>$types,
+            'scopes'=>$scope,
+            'beneficies'=>$beneficies,
+            'numbers'=>$number,
+            'locations'=>$locations,
+            'charges'=>$charges,
+            'organization_id'=>$id,
+
+        ]);
+    }
+    public function storeOrganizationService(Request $request){
+
+           //$this->authorize('adminCreate', Service::class);
+         $request->validate([
+         'name' => 'required',
+         'end'   => 'required',
+         'start' => 'required|before:end',
+         'organization'=>'required',
+         'district'=>'required',
+         'years_district'=> 'required|numeric|gt:0',
+
+
+    ]);
+
+       try {
+DB::beginTransaction();
+
+$is_available=DB::table('year_organization_district')->where('district_id',$request->district)->where('organization_id',$request->organization)->first();
+
+$service=new Service();
+        $service->name=$request->name;
+        $service->description=$request->description;
+        $service->organization_id=$request->organization;
+        $service->district_id=$request->district;
+        $service->areas= $request->specific_area;
+        $service->service_sector_id=$request->type;
+        $service->service_scope=$request->scope;
+
+        $service->service_charge_id=$request->charge;
+        $service->start_date=$request->start;
+        $service->end_date=$request->end;
+        $service->number_of_beneficiary=$request->number;
+        $service->created_at=now();
+        $service->updated_at=NULL;
+
+        $service->save();
+        $service_id=$service->id;
+        /**
+         * store beneficiary if not empty
+         */
+        if(!empty($request->beneficiary) &&count($request->beneficiary)>0){
+            foreach ($request->beneficiary as $key => $value) {
+                DB::table('service_beneficiaries')->insert([
+                    'service_id'=>$service_id,
+                    'beneficiary_id'=>$value['id'],
+                    'created_at'=>now(),
+                ]);
+            }
+        }
+        //T/AS
+          if(!empty($request->ta) &&count($request->ta)>0){
+            foreach ($request->ta as $key => $value) {
+                DB::table('service_at_locations')->insert([
+                    'service_id'=>$service_id,
+                    'location_id'=>$value['id'],
+                    'created_at'=>now(),
+                ]);
+            }
+        }
+
+
+
+      // if location is not emptyc create location
+if(!empty($request->coordinates) && count($request->coordinates)>0){
+    for($i=0;   $i < count($request->coordinates); $i++){
+    $location=new Location();
+$location->service_id= $service_id;
+$location->latitude=$request->coordinates[$i]['lat'];
+$location->longitude=$request->coordinates[$i]['lng'];
+$location->created_at=now();
+$location->updated_at=NULL;
+$location->save();
+    }
+}
+if($request->other_b!=null){
+    DB::table('type_other')->insert(
+    [
+     'service_id' => $service_id,
+     'name' =>$request->other_b,
+     'created_at'=>now(),
+     'updated_at'=>NULL,
+     ]
+);
+
+}
+if($is_available==null){
+    DB::table('year_organization_district')->insert(
+    [
+     'organization_id' => $request->organization,
+     'district_id' =>$request->district,
+     'years_in_districts'=>$request->years_district,
+     'created_at'=>now(),
+     'updated_at'=>NULL,
+     ]
+);
+}
+DB::commit();
+         return redirect()->route('admin.organization.show', $request->organization)
+            ->with('message', __('Service created successfully.'));
+       } catch (Exception $e) {
+        DB::rollback();
+        //throw $th;
+   return redirect()->route('admin.organization.show', $request->organization)
+            ->with('error', __('Failed creating service.'));
+       }
+
     }
 }

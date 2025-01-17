@@ -54,4 +54,6 @@ Route::group([
       Route::get('getDistrictTA/{id?}','DistrictController@getDistrictTA')->name('tas');
       Route::get('getDistrictOrganization/{id?}','DistrictController@getDistrictOrganization')->name('getDistrictOrganization');
       Route::get('getBeneficiaryType/{id?}','ServiceController@getBeneficiaryType')->name('beneficiaryType');
+      Route::get('addServiceToOrganization/{id}','OrganizationController@addService')->name('organization.addService');
+      Route::post('storeOrganizationService','OrganizationController@storeOrganizationService')->name('organization.storeService');
 });
