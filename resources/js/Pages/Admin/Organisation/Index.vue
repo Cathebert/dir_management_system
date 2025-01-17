@@ -33,6 +33,7 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    path:String,
 })
 
 const form = useForm({
@@ -122,7 +123,7 @@ function destroy(id) {
                                             class="block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800" />
                                     </div>
                                     <div v-else>
-                                        <img :src="organization.logo" :alt="organization.url"
+                                        <img :src="path+'/'+organization.logo" :alt="organization.url"
                                             style="border-radius: 50%;"
                                             class="block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800" />
                                     </div>

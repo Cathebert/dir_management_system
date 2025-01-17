@@ -189,6 +189,7 @@ $organizations=Organization::get();
     public function update(UserUpdateData $data, User $user, UserUpdateAction $userUpdateAction)
     {
         $this->authorize('adminUpdate', $user);
+
         $userUpdateAction->handle($data, $user);
 
         return redirect()->route('admin.user.index')

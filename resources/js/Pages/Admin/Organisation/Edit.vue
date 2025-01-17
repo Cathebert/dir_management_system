@@ -33,7 +33,8 @@ const props = defineProps({
     sector_selected:{
         type: Object,
         default: () => ({}),
-    }
+    },
+    path: String,
 })
 
 const form = useForm({
@@ -54,7 +55,7 @@ const form = useForm({
 <template>
     <LayoutAuthenticated>
 
-        <Head title="Update Organization" />
+        <Head title="Update Organization"/>
         <SectionMain>
             <SectionTitleLineWithButton :icon="mdiHome" title="Update Organization" main>
                 <BaseButton :route-name="route('admin.organization.index')" :icon="mdiArrowLeftBoldOutline" label="Back"
@@ -145,7 +146,7 @@ const form = useForm({
                             class="block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800" />
                     </div>
                     <div v-else>
-                        <img :src="organization.logo" :alt="organization.url"
+                        <img :src="path+'/'+organization.logo" :alt="organization.url"
                             class="block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800" />
                     </div>
                 </div>

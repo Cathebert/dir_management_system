@@ -100,6 +100,7 @@ class OrganizationController extends Controller
         return Inertia::render('Admin/Organisation/Index', [
             'items' =>collect( $organizations),
             'default_logo'=>asset('logo/logo.png'),
+            'path'=>asset('logo'),
             'filters' => request()->all('search'),
             'can' => [
                 'create' => Auth::user()->can('media create'),
@@ -148,20 +149,21 @@ $names=District::select('id','name')
      */
     public function store(Request $request)
     {
-        $this->authorize('adminCreate', Organization::class);
+
+        //$this->authorize('adminCreate', Organization::class);
          $request->validate([
         'name' => 'required',
         'sector' => 'required',
-        'district_id'=>'required',
+        'district'=>'required',
 
 
     ]);
-
-    $logo='/logo/logo.png';
+  //dd($request);
+    $logo='logo.png';
 try{
-    if($request->hasFile('file')){
+  if($request->hasFile('file')){
 $filename = time() . '.' . $request->file->extension();
-$logo='/logo/'.$filename;
+$logo=$filename;
 $request->file->move(public_path()."/logo/", $filename);
     }
 $organization=new Organization();
@@ -169,7 +171,7 @@ $organization->organization_type_id=$request->type;
 $organization->name=$request->name;
 
 $organization->description=$request->description;
-$organization->district=$request->district_id;
+$organization->district_id=$request->district;
 $organization->phone=$request->phone;
 $organization->address=$request->address;
 $organization->url=$request->url;
@@ -233,6 +235,8 @@ $selected=OrganizationType::where('id',$organization->organization_type_id)->fir
         return Inertia::render('Admin/Organisation/Edit', [
             'organization' => $organization,
              'typeOptions' => $typeOptions,
+               'default_logo'=>asset('logo/logo.png'),
+            'path'=>asset('logo'),
              'selected'=>$selected,
              'sector_selected'=>$chosen_sector,
               'sectors'=>$sectors,
@@ -261,11 +265,11 @@ $selected=OrganizationType::where('id',$organization->organization_type_id)->fir
 $filename = time() . '.' . $request->file->extension();
  $imageUnlink = public_path() .''. $organization->logo;
   if (file_exists($imageUnlink)) {
-                    unlink($imageUnlink);
+                   // unlink($imageUnlink);
                 }
 
 $request->file->move(public_path()."/logo/", $filename);
-$logo='/logo/'.$filename;
+$logo=$filename;
         }
 
  Organization::where('id',$id)->update([

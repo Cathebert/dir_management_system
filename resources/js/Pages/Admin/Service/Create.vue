@@ -95,7 +95,7 @@ onMounted(() => {
 //L.marker([e.latlng.lat, e.latlng.lng],).addTo(map);
 });
 
-let TAs = ref({})
+let TAs = ref([])
 const props = defineProps({
     organizations: {
         type: Object,
@@ -135,7 +135,7 @@ const props = defineProps({
     },
 
 tas:{
-    type: Object,
+    type: Array,
     default: () => ({}),
 },
 
@@ -221,9 +221,9 @@ function showOther(value) {
 <template>
     <LayoutAuthenticated>
 
-        <Head title="Add Service" />
+        <Head title="Add Complementary Social Service " />
         <SectionMain>
-            <SectionTitleLineWithButton :icon="mdiServer" title="Add Service" main>
+            <SectionTitleLineWithButton :icon="mdiServer" title="Add Complementary Social Service" main>
                 <BaseButton :route-name="route('admin.service.index')" :icon="mdiArrowLeftBoldOutline" label="Back"
                     color="white" rounded-full small />
             </SectionTitleLineWithButton>
@@ -275,14 +275,23 @@ function showOther(value) {
                     </FormControl>
                 </FormField>
 
-                <FormField label="T/A" :class="{ 'text-red-400': form.errors.district }">
+                <!-- <FormField label="T/A" :class="{ 'text-red-400': form.errors.ta }">
                     <FormControl v-model="form.ta" type="select" :options="TAs" label="name"
                         placeholder="--Select T/A--" :error="form.errors.ta">
-                        <div class="text-red-400 text-sm" v-if="form.errors.district">
-                            {{ form.errors.district }}
+                        <div class="text-red-400 text-sm" v-if="form.errors.ta">
+                            {{ form.errors.ta}}
                         </div>
                     </FormControl>
+                </FormField> -->
+
+                <FormField label="T/A" :class="{ 'text-red-400': form.errors.ta }">
+                    <VueMultiselect v-model="form.ta" :options="TAs" :multiple="true" :close-on-select="true"
+                        placeholder="--Select T/As--" label="name" track-by="id" :style="{ 'color': activeColor }" />
                 </FormField>
+                <div class="text-red-400 text-sm" v-if="form.errors.ta">
+                    {{ form.errors.ta }}
+
+                </div>
                 <FormField label="Specific Area within district" :class="{ 'text-red-400': form.errors.district }">
                     <FormControl v-model="form.specific_area" type="textarea" label="Specific Area"
                         :error="form.errors.specific_area" placeholder="Enter Specific Areas within the district">
@@ -434,7 +443,7 @@ function showOther(value) {
                     </FormControl>
                 </FormField>-->
 
-               <!--  <FormField label="press S when desired location is pinned" style="color: brown;"
+                <!--  <FormField label="press S when desired location is pinned" style="color: brown;"
                     :class="{ 'text-red-400': form.errors.unique }">
                     <FormControl v-model="form.latitude" type="hidden" :error="form.errors.latitude" id="latitude">
                         <div class="text-red-400 text-sm" v-if="form.errors.latitude">

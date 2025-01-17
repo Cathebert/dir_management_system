@@ -248,14 +248,14 @@ $names=District::select('id','name')
      */
     public function store(Request $request)
     {
-
+dd($request->ta);
         //$this->authorize('adminCreate', Service::class);
          $request->validate([
-        'name' => 'required',
+         'name' => 'required',
          'end'   => 'required',
          'start' => 'required|before:end',
          'organization'=>'required',
-        'district'=>'required',
+         'district'=>'required',
          'years_district'=> 'required|numeric|gt:0',
 
 
@@ -263,13 +263,7 @@ $names=District::select('id','name')
 
        try {
 DB::beginTransaction();
-if(!empty($request->ta)){
-    $tas=DB::table('district_traditionals')->where('id',$request->ta)->select('name')->first();
-    $specific_location=$tas->name.'-'.$request->specific_area;
-   }
-   else{
-    $specific_location=$request->specific_area;
-   }
+
 $is_available=DB::table('year_organization_district')->where('district_id',$request->district)->where('organization_id',$request->organization)->first();
 
 $service=new Service();
@@ -277,8 +271,7 @@ $service=new Service();
         $service->description=$request->description;
         $service->organization_id=$request->organization;
         $service->district_id=$request->district;
-        $service->areas=$request->ta;
-        $service->areas= $specific_location;
+        $service->areas= $request->specific_area;
         $service->service_sector_id=$request->type;
         $service->service_scope=$request->scope;
 
@@ -303,6 +296,17 @@ $service=new Service();
                 ]);
             }
         }
+        //T/AS
+          if(!empty($request->ta) &&count($request->ta)>0){
+            foreach ($request->ta as $key => $value) {
+                DB::table('service_at_locations')->insert([
+                    'service_id'=>$service_id,
+                    'location_id'=>$value['id'],
+                    'created_at'=>now(),
+                ]);
+            }
+        }
+
 
 
       // if location is not emptyc create location
@@ -396,6 +400,9 @@ $beneficiary=DB::table('beneficiaries')
        ->select('beneficiaries.id','beneficiaries.name')
        ->get(); //dd($beneficiary);
 $other_beneficiary=DB::table('type_other')->where('service_id',$id)->select('name')->first();
+  $selected_tas_id=DB::table('service_at_locations')->where('service_id',$id)->pluck('location_id')->toArray();
+
+       $selected_Tas=DB::table('district_traditionals')->whereIn('id',$selected_tas_id)->select('id','name')->get();
 
 if($service==null){
     $service = Service::findOrFail($id);
@@ -408,6 +415,7 @@ $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->
             'service' => $service,
             'coordinates'=>$coordinates,
             'beneficiaries'=>$beneficiary,
+            'selected_tas'=> $selected_Tas,
             'organization_sector'=>$organization_sector,
             'organization_type'=>$organization_type,
             'other_beneficiary'=>$other_beneficiary,
@@ -461,14 +469,18 @@ $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->
 
         $selected=District::where('id',$service->district_id)->first();
         $tas=DB::table('district_traditionals')->where('district_id',$service->district_id)->get();
-        $ta=DB::table('district_traditionals')->where('id',$service->areas)->first();
+        $selected_tas_id=DB::table('service_at_locations')->where('service_id',$id)->pluck('location_id')->toArray();
+
+       $selected_Tas=DB::table('district_traditionals')->whereIn('id',$selected_tas_id)->select('id','name')->get();
+
+
         //dd($typeOptions);
 
         $beneficies=DB::table('beneficiaries')->get();
         $beneficiary_ids=DB::table('service_beneficiaries')->where('service_id',$id)->pluck('beneficiary_id')->toArray();
-       $beneficiary_selected=DB::table('beneficiaries')->whereIn('id', $beneficiary_ids)->select('id','name')->get();
+        $beneficiary_selected=DB::table('beneficiaries')->whereIn('id', $beneficiary_ids)->select('id','name')->get();
         //dd($beneficiary_ids);
-       $charges= DB::table('service_charges')->get();
+        $charges= DB::table('service_charges')->get();
         $charge_selected= DB::table('service_charges')->where('id',$service->service_charge_id)->select('id','name')->first();
         $number=array('<100','100-500','501-1000','>1000');
         $locations=array('1','2-3','4-5','More than 5');
@@ -478,6 +490,7 @@ $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->
             'organization'=>$organization,
             'districts'=>$districts,
             'tas'=>$tas,
+            'selected_tas'=>$selected_Tas,
             'charges'=>$charges,
             'charge_selected'=>$charge_selected,
             'district'=>$selected,
@@ -506,13 +519,7 @@ $coordinates=Location::where('service_id',$id)->select('latitude','longitude')->
          'number'=> 'required',
          ]);
 
-if(!empty($request->ta)){
-    $tas=DB::table('district_traditionals')->where('id',$request->ta)->select('name')->first();
-    $specific_location=$tas->name.'-'.$request->specific_area;
-   }
-   else{
-    $specific_location=$request->specific_area;
-   }
+
 //dd($specific_location);
     $service->update([
     'name'=>$request->name,
@@ -520,7 +527,7 @@ if(!empty($request->ta)){
     'organization_id'=>$request->organization,
     'end_date'=>$request->end,
     'district_id'=>$request->district,
-    'areas'=>$specific_location,
+    'areas'=>$request->specific_area,
     'service_charge_id'=>$request->charge,
     'number_of_beneficiary'=>$request->number,
 
@@ -540,8 +547,17 @@ $service_id=$service->id;
                 ]);
             }
         }
-
-
+ //T/AS
+          if(!empty($request->ta) &&count($request->ta)>0){
+            DB::table('service_at_locations')->where('service_id',$service_id)->delete();
+            foreach ($request->ta as $key => $value) {
+                DB::table('service_at_locations')->insert([
+                    'service_id'=>$service_id,
+                    'location_id'=>$value['id'],
+                    'created_at'=>now(),
+                ]);
+            }
+        }
              if(count($request->coordinates)>0){
         Location::where('service_id',$service_id)->delete();
     for($i=0;   $i < count($request->coordinates); $i++){

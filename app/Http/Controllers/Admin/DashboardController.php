@@ -18,10 +18,14 @@ class DashboardController extends Controller
   if(auth()->user()->organisation_id==0 && auth()->user()->organization_id==0){
 $service_count=Service::count();
 $users=User::count();
+$beneficiary_count=Service::selectRaw('sum(number_of_beneficiary) as beneficiaries')->get();
+
     }
      if(auth()->user()->organization_id===NULL){
+
 $service_count=Service::where('district_id',auth()->user()->district_id)->count();
 $users=User::where('district_id',auth()->user()->district_id)->count();
+$beneficiary_count=Service::selectRaw('sum(number_of_beneficiary) as beneficiaries')->where('district_id',auth()->user()->district_id)->get();
     }
 
       if(auth()->user()->organization_id!=NULL){
@@ -31,6 +35,8 @@ $service_count=Service::where('district_id',auth()->user()->district_id)
 $users=User::where('district_id',auth()->user()->district_id)
 ->where('organization_id',auth()->user()->organization_id)
 ->count();
+$beneficiary_count=Service::selectRaw('sum(number_of_beneficiary) as beneficiaries')->where('organization_id',auth()->user()->organization_id)->get();
+
     }
 
    // $this->authorize('adminViewAny', Organization::class);
@@ -96,8 +102,10 @@ $organizations = (new  Organization)->newQuery();
             'items' =>collect( $organizations),
             'organization_count'=>count($organizations),
             'service_count'=>$service_count,
-            'users'=>$users,
+            'users'=>$beneficiary_count[0]->beneficiaries,
             'default_logo'=>asset('logo/logo.png'),
+            'path'=>asset('logo'),
+            'beneficiary_sum'=>$beneficiary_count,
             'filters' => request()->all('search'),
             'can' => [
                 'create' => Auth::user()->can('media create'),

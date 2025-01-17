@@ -108,6 +108,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    selected_tas:{
+        type: Object,
+        default: () => ({}),
+    }
 
 })
 
@@ -123,9 +127,9 @@ console.log(props.service)
 <template>
     <LayoutAuthenticated>
 
-        <Head title="View Service" />
+        <Head title="View Complementary Social Service" />
         <SectionMain>
-            <SectionTitleLineWithButton :icon="mdiServer" title="View Service" main>
+            <SectionTitleLineWithButton :icon="mdiServer" title="View Complementary Social Service" main>
                 <BaseButton :route-name="route('admin.service.index')" :icon="mdiArrowLeftBoldOutline" label="Back"
                     color="white" rounded-full small />
             </SectionTitleLineWithButton>
@@ -234,7 +238,46 @@ console.log(props.service)
                                 District
                             </td>
                             <td data-label="District">
-                                {{ service.district }}[{{ service.areas }}]
+                                {{ service.district }}
+                            </td>
+                        </tr>
+
+
+
+                        <tr v-if="selected_tas.length>0">
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                T/As
+                            </td>
+                            <td data-label="T/As">
+                                <ul>
+                                    <li v-for="value in selected_tas" :key="value.id">
+                                        {{ value.name }}
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+
+
+                        <tr v-if="service.areas">
+                            <td class="
+                  p-4
+                  pl-8
+                  text-slate-500
+                  dark:text-slate-400
+                  hidden
+                  lg:block
+                ">
+                                Specific Area
+                            </td>
+                            <td data-label="Specific Area">
+                                {{ service.areas }}
                             </td>
                         </tr>
 

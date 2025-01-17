@@ -49,7 +49,7 @@ const form = useForm({
 <template>
     <LayoutAuthenticated>
 
-        <Head title="Create media" />
+        <Head title="Create Organization" />
         <SectionMain>
             <SectionTitleLineWithButton :icon="mdiHome" title="Add Organization" main>
                 <BaseButton :route-name="route('admin.organization.index')" :icon="mdiArrowLeftBoldOutline" label="Back"
@@ -96,7 +96,7 @@ const form = useForm({
                     <FormField label="Organization Sector" :class="{ 'text-red-400': form.errors.sector }">
                         <VueMultiselect v-model="form.sector" :options="sectors" :multiple="true"
                             :close-on-select="true" placeholder="--Select Organization sectors--" label="name"
-                            track-by="name" :style="{ 'background-color' : activeColor }" />
+                            track-by="id" />
                     </FormField>
                     <div class="text-red-400 text-sm" v-if="form.errors.sector">
                         {{ form.errors.sector }}

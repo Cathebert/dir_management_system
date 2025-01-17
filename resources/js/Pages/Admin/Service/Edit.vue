@@ -179,8 +179,11 @@ districts: {
         tas: {
             type: Object,
             default: () => ({}),
-        }
-,
+        },
+    selected_tas: {
+        type: Object,
+        default: () => ({}),
+    },
         coordinates: {
         type: Object,
         default: () => ({}),
@@ -195,7 +198,7 @@ const form = useForm({
     description: props.service.description,
     district: props.districts.id ?? props.district.id,
     organization:props.organizations.id ?? props.organization.id,
-    ta: props.tas.id??props.service.ta,
+    ta: props.selected_tas??props.tas,
     specific_area: props.service.areas,
     beneficiary: props.beneficiary_selected ?? props.beneficiaries,
     start: props.service.start_date,
@@ -240,9 +243,9 @@ function getTAs(id) {
 <template>
     <LayoutAuthenticated>
 
-        <Head title="Update Service" />
+        <Head title="Update Complementary Social Service" />
         <SectionMain>
-            <SectionTitleLineWithButton :icon="mdiServer" title="Update Service" main>
+            <SectionTitleLineWithButton :icon="mdiServer" title="Update Complementary Social Service" main>
                 <BaseButton :route-name="route('admin.service.index')" :icon="mdiArrowLeftBoldOutline" label="Back"
                     color="white" rounded-full small />
             </SectionTitleLineWithButton>
@@ -297,16 +300,24 @@ function getTAs(id) {
                     </FormControl>
                 </FormField>
 
-                <FormField label="T/A" :class="{ 'text-red-400': form.errors.district }">
+                <!--  <FormField label="T/A" :class="{ 'text-red-400': form.errors.district }">
                     <FormControl v-model="form.ta" type="select" :options="TAs" label="name"
                         placeholder="--Select T/A--" :error="form.errors.ta">
                         <div class="text-red-400 text-sm" v-if="form.errors.district">
                             {{ form.errors.district }}
                         </div>
                     </FormControl>
+                </FormField> -->
+
+
+                <FormField label="T/A" :class="{ 'text-red-400': form.errors.ta }">
+                    <VueMultiselect v-model="form.ta" :options="tas" :multiple="true" :close-on-select="true"
+                        placeholder="--Select T/As--" label="name" track-by="id" :style="{ 'color': activeColor }" />
                 </FormField>
+                <div class="text-red-400 text-sm" v-if="form.errors.ta">
+                    {{ form.errors.ta }}
 
-
+                </div>
                 <FormField label="Specific Area within district" :class="{ 'text-red-400': form.errors.district }">
                     <FormControl v-model="form.specific_area" type="textarea" label="Specific Area"
                         :error="form.errors.specific_area" placeholder="Enter Specific Areas within the district">

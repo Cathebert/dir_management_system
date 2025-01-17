@@ -102,7 +102,7 @@ $mediaItems = (new District)->newQuery();
             'filters' => request()->all('search'),
             'can' => [
                 'create' => $add,
-                'edit' => Auth::user()->can('media edit'),
+                'edit' => $add,
                 'delete' => $add,
             ],
         ]);

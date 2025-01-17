@@ -78,9 +78,9 @@ else{
 <template>
     <LayoutAuthenticated>
 
-        <Head title="Service" />
+        <Head title="Complementary Social Services" />
         <SectionMain>
-            <SectionTitleLineWithButton :icon="mdiServer" :title="' Services #' + items.data.length"
+            <SectionTitleLineWithButton :icon="mdiServer" :title="' Complementary Social Services #' + items.data.length"
                 main>
                 <BaseButton v-if="can.delete" :route-name="route('admin.service.create')" :icon="mdiPlus" label="Add"
                     color="info" rounded-full small />
