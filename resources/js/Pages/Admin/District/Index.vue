@@ -95,9 +95,9 @@ function destroy(id) {
 
                     <tbody>
 
-                        <tr v-for="media in items.data" :key="media.id">
+                        <tr v-for="(media,index) in items.data" :key="media.id">
                             <td data-label="#">
-                                 {{ media.id }}
+                                 {{ index +1 }}
                             </td>
                             <td data-label="Name">
                                 <Link :href="route('admin.district.show', media.id)" class="

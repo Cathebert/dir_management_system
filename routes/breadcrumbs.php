@@ -117,3 +117,12 @@ Breadcrumbs::for('admin.organization.addService', function (BreadcrumbTrail $tra
     $trail->parent('admin.dashboard');
     $trail->push('Service', route('admin.organization.addService',[$id]));
 });
+Breadcrumbs::for('admin.getDistrictId', function (BreadcrumbTrail $trail,$id) {
+    $trail->parent('admin.dashboard');
+    $trail->push('DistrictName', route('admin.getDistrictId',[$id]));
+});
+
+Breadcrumbs::for('admin.getDashboardData', function (BreadcrumbTrail $trail,$id) {
+    $trail->parent('admin.dashboard');
+    $trail->push('Dashboard', route('admin.getDashboardData',[$id]));
+});

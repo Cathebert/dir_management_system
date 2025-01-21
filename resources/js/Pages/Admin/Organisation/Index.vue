@@ -9,6 +9,7 @@ import {
     mdiEarth,
     mdiHome,
 } from "@mdi/js"
+import { ref,} from 'vue';
 import LayoutAuthenticated from "@/Layouts/Admin/LayoutAuthenticated.vue"
 import SectionMain from "@/Components/SectionMain.vue"
 import SectionTitleLineWithButton from "@/Components/SectionTitleLineWithButton.vue"
@@ -18,10 +19,16 @@ import BaseButtons from "@/Components/BaseButtons.vue"
 import NotificationBar from "@/Components/NotificationBar.vue"
 import Pagination from "@/Components/Admin/Pagination.vue"
 import Sort from "@/Components/Admin/Sort.vue"
+import FormControl from "@/Components/FormControl.vue"
+import FormField from "@/Components/FormField.vue"
 
 const props = defineProps({
     default_logo:null,
     items: {
+        type: Object,
+        default: () => ({}),
+    },
+    districts: {
         type: Object,
         default: () => ({}),
     },
@@ -38,6 +45,7 @@ const props = defineProps({
 
 const form = useForm({
     search: props.filters.search,
+    district_id:null,
 })
 
 const formDelete = useForm({})
@@ -47,6 +55,29 @@ function destroy(id) {
         formDelete.delete(route("admin.organization.destroy", id))
     }
 }
+
+const getDistrict = (id) => {
+    let route = window.routes.getDistrictId;
+
+    if(id){
+    axios.get(route + '/' + id).then((response) => {
+console.log(response)
+        if (response.data) {
+            console.log(response.data)
+
+
+            document.getElementById('ty' + id).innerHTML = response.data
+        }
+        else {
+            document.getElementById('ty' + id).innerHTML = "N/A"
+        }
+        //return response.data
+    }).catch((error) => {
+        console.log(error)
+    })
+    }
+};
+
 </script>
 
 <template>
@@ -72,11 +103,30 @@ function destroy(id) {
                   border-gray-300
                   focus:border-indigo-300
                   focus:ring
+
                   focus:ring-indigo-200
-                  focus:ring-opacity-50
-                " placeholder="Search" />
+                  focus:ring-opacity-100
+                " placeholder="Search" style="color:black" v-if="can.search" />
                             <BaseButton label="Search" type="submit" color="info"
-                                class="ml-4 inline-flex items-center px-4 py-2" />
+                                class="ml-4 inline-flex items-center px-4 py-2" v-if="can.search" />
+                            <FormField label="Filter By District" v-if="can.filter">
+
+                                <FormControl v-model="form.district_id" type="select" label="name" class="
+                  rounded-md
+                  shadow-sm
+                  border-gray-300
+                  focus:border-indigo-300
+                  focus:ring
+                  focus:ring-indigo-200
+                  focus:ring-opacity-50" placeholder=" All" :error="form.errors.district_id" :options="districts">
+                                    <div class="text-red-400 text-sm" v-if="form.errors.district_id">
+                                        {{ form.errors.district_id }}
+                                    </div>
+                                </FormControl>
+
+                                <BaseButton label="Go" type="submit" color="info"
+                                    class="ml-4 inline-flex items-center px-4 py-2" />
+                            </FormField>
                         </div>
                     </div>
                 </form>
@@ -91,6 +141,7 @@ function destroy(id) {
                             </th>
                             <th>Logo</th>
                             <th>Url</th>
+                            <th>District</th>
                             <th>Description</th>
                             <th>Address</th>
                             <th>Phone</th>
@@ -102,9 +153,9 @@ function destroy(id) {
 
                     <tbody>
 
-                        <tr v-for=" organization in items.data" :key="organization.id">
+                        <tr v-for="(organization, index) in items.data" :key="organization.id">
                             <td data-label="#">
-                                {{ organization.id }}
+                                {{index+1 }}
                             </td>
                             <td data-label="Name">
                                 <Link :href="route('admin.organization.show', organization.id)" class="
@@ -142,6 +193,10 @@ function destroy(id) {
                             <td v-else>
 
                             </td>
+                            <td data-label="District">
+                                {{ getDistrict(organization.id) }}
+                                <div :id="`ty${organization.id}`"></div>
+                            </td>
                             <td data-label="Description">
                                 {{ organization.description }}
                             </td>
@@ -166,7 +221,9 @@ function destroy(id) {
                                         @click="destroy(organization.id)" />
                                 </BaseButtons>
                             </td>
+
                         </tr>
+
                     </tbody>
                 </table>
                 <div class="py-4">

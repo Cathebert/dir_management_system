@@ -17,6 +17,7 @@ class DashboardController extends Controller
 
   if(auth()->user()->organisation_id==0 && auth()->user()->organization_id==0){
 $service_count=Service::count();
+ $org=Organization::count();
 $users=User::count();
 $beneficiary_count=Service::selectRaw('sum(number_of_beneficiary) as beneficiaries')->get();
 
@@ -24,11 +25,13 @@ $beneficiary_count=Service::selectRaw('sum(number_of_beneficiary) as beneficiari
      if(auth()->user()->organization_id===NULL){
 
 $service_count=Service::where('district_id',auth()->user()->district_id)->count();
+ $org=Organization::where('district_id',auth()->user()->district_id)->count();
 $users=User::where('district_id',auth()->user()->district_id)->count();
 $beneficiary_count=Service::selectRaw('sum(number_of_beneficiary) as beneficiaries')->where('district_id',auth()->user()->district_id)->get();
     }
 
       if(auth()->user()->organization_id!=NULL){
+ $org=Organization::where('district_id',auth()->user()->district_id)->count();
 $service_count=Service::where('district_id',auth()->user()->district_id)
 ->where('organization_id',auth()->user()->organization_id)
 ->count();
@@ -98,9 +101,11 @@ $organizations = (new  Organization)->newQuery();
 
 
     }
+    $districts=District::where('id','<>',0)->get();
         return Inertia::render('Admin/Dashboard', [
             'items' =>collect( $organizations),
-            'organization_count'=>count($organizations),
+            'organization_count'=>$org,
+            'districts'=>$districts,
             'service_count'=>$service_count,
             'users'=>$beneficiary_count[0]->beneficiaries,
             'default_logo'=>asset('logo/logo.png'),
@@ -113,5 +118,13 @@ $organizations = (new  Organization)->newQuery();
                 'delete' => Auth::user()->can('media delete'),
             ],
         ]);
+    }
+
+    public function getDashboardData($id){
+        $service_count=Service::where('district_id',$id)->count();
+
+      return([
+        'service_count'=>$service_count,
+      ]);
     }
 }

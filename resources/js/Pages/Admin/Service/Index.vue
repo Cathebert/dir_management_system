@@ -19,6 +19,8 @@ import BaseButtons from "@/Components/BaseButtons.vue"
 import NotificationBar from "@/Components/NotificationBar.vue"
 import Pagination from "@/Components/Admin/Pagination.vue"
 import Sort from "@/Components/Admin/Sort.vue"
+import FormField from "@/Components/FormField.vue"
+import FormControl from "@/Components/FormControl.vue"
 import { get } from "lodash"
 import axios from "axios"
 
@@ -26,6 +28,10 @@ import axios from "axios"
 const props = defineProps({
     default_logo: null,
     items: {
+        type: Object,
+        default: () => ({}),
+    },
+    districts: {
         type: Object,
         default: () => ({}),
     },
@@ -41,6 +47,7 @@ const props = defineProps({
 
 const form = useForm({
     search: props.filters.search,
+    district_id: null,
 })
 
 const formDelete = useForm({})
@@ -99,11 +106,30 @@ else{
                   border-gray-300
                   focus:border-indigo-300
                   focus:ring
+
                   focus:ring-indigo-200
-                  focus:ring-opacity-50
-                " placeholder="Search" />
+                  focus:ring-opacity-100
+                " placeholder="Search" style="color:black"  v-if="can.search" />
                             <BaseButton label="Search" type="submit" color="info"
-                                class="ml-4 inline-flex items-center px-4 py-2" />
+                                class="ml-4 inline-flex items-center px-4 py-2" v-if="can.search" />
+                            <FormField label="Filter By District" v-if="can.filter">
+
+                                <FormControl v-model="form.district_id" type="select" label="name" class="
+                  rounded-md
+                  shadow-sm
+                  border-gray-300
+                  focus:border-indigo-300
+                  focus:ring
+                  focus:ring-indigo-200
+                  focus:ring-opacity-50" placeholder=" All" :error="form.errors.district_id" :options="districts">
+                                    <div class="text-red-400 text-sm" v-if="form.errors.district_id">
+                                        {{ form.errors.district_id }}
+                                    </div>
+                                </FormControl>
+
+                                <BaseButton label="Go" type="submit" color="info"
+                                    class="ml-4 inline-flex items-center px-4 py-2" />
+                            </FormField>
                         </div>
                     </div>
                 </form>
@@ -132,10 +158,10 @@ else{
 
                     <tbody>
 
-                        <tr v-for=" organization in items.data" :key="organization.id">
+                        <tr v-for=" (organization,index) in items.data" :key="organization.id">
                             <td>
 
-                                {{ organization.id }}
+                                {{ index + 1 }}
 
                             </td>
                             <td data-label="Name">

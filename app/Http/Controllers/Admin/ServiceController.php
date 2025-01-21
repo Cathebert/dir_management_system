@@ -53,7 +53,29 @@ class ServiceController extends Controller
 
                 ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','o.id as organization_id','d.name as district','sc.name as charge','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
                 ->orderBy('s.id','DESC');
+ if (request()->has('district_id')) {
+        if(request()->input('district_id')!=null){
+    $service=DB::table('services as s')
+                ->join('organizations as o','s.organization_id','=','o.id')
+                ->join('districts as d','s.district_id','=','d.id')
 
+                ->join('service_charges as sc','s.service_charge_id','=','sc.id')
+
+                ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','o.id as organization_id','d.name as district','sc.name as charge','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
+                ->where('s.district_id', request()->input('district_id'))
+                ->orderBy('s.id','DESC');
+ }
+ else{
+   $service=DB::table('services as s')
+                ->join('organizations as o','s.organization_id','=','o.id')
+                ->join('districts as d','s.district_id','=','d.id')
+
+                ->join('service_charges as sc','s.service_charge_id','=','sc.id')
+
+                ->select('s.id as id','s.name as service_name','s.description','o.name as organization_name','o.id as organization_id','d.name as district','sc.name as charge','s.start_date','s.end_date','s.areas','s.number_of_beneficiary','s.created_at','s.updated_at')
+                ->orderBy('s.id','DESC');
+ }
+ }
   if (request()->query('sort')) {
      $service=DB::table('services as s')
                 ->join('organizations as o','s.organization_id','=','o.id')
@@ -164,11 +186,25 @@ class ServiceController extends Controller
 
 
    }
+   if(auth()->user()->district_id===0 && auth()->user()->organization_id==0 ){
+        $add=true;
+        $search=false;
+        $filter=true;
+    }
+    else{
+        $add=false;
+        $search=true;
+        $filter=false;
+    }
+     $districts=District::where('id','<>',0)->get();
         return Inertia::render('Admin/Service/Index', [
             'items' =>collect( $organizations),
             'default_logo'=>asset('logo/location_img.png'),
             'filters' => request()->all('search'),
+            'districts'=>$districts,
             'can' => [
+                 'search'=>$search,
+                'filter'=>$filter,
                 'create' => Auth::user()->can('media create'),
                 'edit' => Auth::user()->can('media edit'),
                 'delete' => Auth::user()->can('media delete'),

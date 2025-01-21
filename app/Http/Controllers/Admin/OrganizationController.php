@@ -23,9 +23,18 @@ class OrganizationController extends Controller
 
 
          $this->authorize('adminViewAny', Organization::class);
+
            if(auth()->user()->organisation_id==0 && auth()->user()->organization_id==0){
         $organizations = (new Organization)->newQuery();
+  if (request()->has('district_id')) {
 
+            if(request()->input('district_id')!=null){
+            $organizations->where('district_id', request()->input('district_id'));
+  }
+  else{
+    $organizations->latest();
+  }
+        }
         if (request()->has('search')) {
             $organizations->where('name', 'Like', '%'.request()->input('search').'%');
         }
@@ -47,8 +56,13 @@ class OrganizationController extends Controller
     }
 //district
     if(auth()->user()->organization_id===NULL){
+
    $organizations = (new Organization)->newQuery();
 
+        if (request()->has('sort')) {
+            dd(request()->input('sort'));
+            $organizations->where('district_id', '=', request()->input('sort'));
+        }
         if (request()->has('search')) {
             $organizations->where('name', 'Like', '%'.request()->input('search').'%');
         }
@@ -67,7 +81,6 @@ class OrganizationController extends Controller
 
        $organizations =  $organizations->where('id','<>',0)->where('district_id',auth()->user()->district_id)->paginate(config('admin.paginate.per_page'))
             ->onEachSide(config('admin.paginate.each_side'));
-
 
     }
 
@@ -98,13 +111,27 @@ class OrganizationController extends Controller
 
 
     }
+  $districts=District::where('id','<>',0)->get();
+if(auth()->user()->district_id===0 && auth()->user()->organization_id==0 ){
+        $add=true;
+        $search=false;
+        $filter=true;
+    }
+    else{
+        $add=false;
+        $search=true;
+        $filter=false;
+    }
         return Inertia::render('Admin/Organisation/Index', [
             'items' =>collect( $organizations),
             'default_logo'=>asset('logo/logo.png'),
             'path'=>asset('logo'),
+            'districts'=>$districts,
             'filters' => request()->all('search'),
             'can' => [
-                'create' => Auth::user()->can('media create'),
+                'search'=>$search,
+                'filter'=>$filter,
+                'create' =>$add,
                 'edit' => Auth::user()->can('media edit'),
                 'delete' => Auth::user()->can('media delete'),
             ],
@@ -485,5 +512,17 @@ DB::commit();
             ->with('error', __('Failed creating service.'));
        }
 
+    }
+
+    public function getDistrictId($id){
+        $org=Organization::find($id);
+        if($org->district_id!=NULL){
+        $district=District::find($org->district_id);
+
+        return $district->name;
+    }
+    else{
+        return"";
+    }
     }
 }

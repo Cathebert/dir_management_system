@@ -56,4 +56,6 @@ Route::group([
       Route::get('getBeneficiaryType/{id?}','ServiceController@getBeneficiaryType')->name('beneficiaryType');
       Route::get('addServiceToOrganization/{id}','OrganizationController@addService')->name('organization.addService');
       Route::post('storeOrganizationService','OrganizationController@storeOrganizationService')->name('organization.storeService');
+      Route::get('getDistrictId/{id?}','OrganizationController@getDistrictId')->name('getDistrictId');
+      Route::get('getDashboardData/{id?}','DashboardController@getDashboardData')->name('getDashboardData');
 });

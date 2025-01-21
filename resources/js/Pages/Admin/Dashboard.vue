@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import { computed, ref, onMounted } from 'vue'
 import { useMainStore } from '@/Stores/main'
 import {
@@ -26,6 +26,8 @@ import CardBoxTransaction from '@/Components/CardBoxTransaction.vue'
 import CardBoxClient from '@/Components/CardBoxClient.vue'
 import LayoutAuthenticated from '@/Layouts/Admin/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/Components/SectionTitleLineWithButton.vue'
+import FormField from '@/Components/FormField.vue'
+import FormControl from '@/Components/FormControl.vue'
 //import SectionBannerStarOnGitHub from '@/Components/SectionBannerStarOnGitHub.vue'
 const chartData = ref(null)
 const fillChartData = () => {
@@ -43,12 +45,17 @@ mainStore.fetchSampleHistory()
 
 const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
 const transactionBarItems = computed(() => mainStore.history)
+
 const props = defineProps({
     default_logo: null,
     organization_count:null,
     service_count:null,
     users:null,
     items: {
+        type: Object,
+        default: () => ({}),
+    },
+    districts: {
         type: Object,
         default: () => ({}),
     },
@@ -63,6 +70,57 @@ const props = defineProps({
     path: String,
 })
 
+
+const form = useForm({
+    search: props.filters.search,
+})
+const getDistrict = (id) => {
+    let route = window.routes.getDistrictId;
+
+    if (id) {
+        axios.get(route + '/' + id).then((response) => {
+            console.log(response)
+            if (response.data) {
+                console.log(response.data)
+
+
+                document.getElementById('ty' + id).innerHTML = response.data
+            }
+            else {
+                document.getElementById('ty' + id).innerHTML = "N/A"
+            }
+            //return response.data
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+};
+
+function getData(id) {
+    if (id) {
+        console.log(id);
+
+        let route = window.routes.getDashboardData
+        axios
+            .get(route + '/' + id)
+            .then(function (result) {
+                let count = result.data.service_count
+                console.log(result.data.service_count)
+
+                //emit('update:service_count', count);
+               //props.service_count=result.data.service_count
+            })
+
+
+
+    }
+    else {
+        form.ta = null
+        TAs = []
+
+    }
+
+}
 </script>
 
 <template>
@@ -73,10 +131,14 @@ const props = defineProps({
 
 
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+                <Link :href="route('admin.organization.index')">
                 <CardBoxWidget :trend=organization_count trend-type="up" color="text-emerald-500" :icon="mdiHome"
                     :number=organization_count label="Organizations" />
+                </Link>
+                <Link :href="route('admin.service.index')">
                 <CardBoxWidget :trend=service_count trend-type="up" color="text-blue-500" :icon="mdiServer"
                     :number=service_count label="Services" />
+                </Link>
                 <CardBoxWidget :trend=users trend-type="alert" color="text-red-500" :icon="mdiAccountMultiple"
                     :number=users label="Beneficiaries" />
 
@@ -106,6 +168,31 @@ const props = defineProps({
 
 
 
+            <form @submit.prevent="form.get(route('admin.service.index'))">
+                <div class="py-2 flex">
+                    <div class="flex pl-4">
+                        <FormField label="Filter By District" v-if="can.filter">
+
+                            <FormControl v-model="form.district_id" type="select" label="name" class="
+                  rounded-md
+                  shadow-sm
+                  border-gray-300
+                  focus:border-indigo-300
+                  focus:ring
+                  focus:ring-indigo-200
+                  focus:ring-opacity-50" placeholder=" All" :error="form.errors.district_id" :options="districts">
+                                <div class="text-red-400 text-sm" v-if="form.errors.district_id">
+                                    {{ form.errors.district_id }}
+                                </div>
+                            </FormControl>
+
+                            <BaseButton label="Go" type="submit" color="info"
+                                class="ml-4 inline-flex items-center px-4 py-2" />
+                        </FormField>
+                    </div>
+                </div>
+            </form>
+
             <CardBox :icon="mdiMonitorCellphone" title="Organization" has-table>
                 <table>
                     <thead>
@@ -116,7 +203,7 @@ const props = defineProps({
                             </th>
                             <th>Logo</th>
                             <th>Url</th>
-
+                            <th>District</th>
                             <th>Description</th>
                             <th>Address</th>
                             <th>Phone</th>
@@ -129,7 +216,7 @@ const props = defineProps({
                     <tbody>
 
                         <tr v-for=" organization in items.data" :key="organization.id">
-                            <td data-label="File">
+                            <td data-label="#">
                                 {{ organization.id }}
                             </td>
                             <td data-label="Name">
@@ -142,7 +229,7 @@ const props = defineProps({
                                 {{ organization.name }}
                                 </Link>
                             </td>
-                            <td data-label="File">
+                            <td data-label="URL">
                                 <div class="w-12 rounded">
                                     <div v-if="organization.logo === null">
                                         <img :src="default_logo" :alt="organization.url" style="border-radius: 50%;"
@@ -165,17 +252,20 @@ const props = defineProps({
                                     {{ organization.name }}
                                 </a>
                             </td>
-
-                            <td>
+                            <td data-label="District">
+                                {{ getDistrict(organization.id) }}
+                                <div :id="`ty${organization.id}`"></div>
+                            </td>
+                            <td data-label="Description">
                                 {{ organization.description }}
                             </td>
-                            <td>
+                            <td data-label="Address">
                                 {{ organization.address }}
                             </td>
-                            <td>
+                            <td data-label="Phone">
                                 {{ organization.phone }}
                             </td>
-                            <td>
+                            <td data-label="Email">
                                 {{ organization.email }}
                             </td>
 

@@ -20,7 +20,9 @@
   window.routes = {
     'getTas' : '{{ route('admin.tas') }}',
     'getBeneficiaryType' : '{{ route('admin.beneficiaryType') }}',
-    'getDistrictOrganization':'{{ route('admin.getDistrictOrganization') }}'
+    'getDistrictOrganization':'{{ route('admin.getDistrictOrganization') }}',
+    'getDistrictId':'{{ route('admin.getDistrictId') }}',
+    'getDashboardData':'{{ route('admin.getDashboardData') }}'
 
   }
 
